@@ -1,0 +1,19 @@
+{
+  "name": "gad-scraper",
+  "version": "1.0.0",
+  "description": "Facebook Marketplace car scraper worker. Reads listings for configured cities and writes new ones into Supabase.",
+  "type": "module",
+  "scripts": {
+    "login": "node src/login.js",
+    "scrape": "node src/scrape-once.js",
+    "start": "node src/index.js",
+    "postinstall": "playwright install chromium"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.14",
+    "playwright": "^1.45.0"
+  }
+}

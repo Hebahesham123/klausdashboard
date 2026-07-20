@@ -1,0 +1,46 @@
+{
+  "_comment": "IMPORTANT: uses Facebook's SEARCH url (/search?query=...), which is the ONLY view that actually honors sortBy=creation_time_descend (newest first) and daysSinceListed. The category-browse url ignores those and returns a 'Suggested' mix. query=car/truck/suv covers all body styles. daysSinceListed=30 = last 24h so brand-new cars surface at the top every cycle. radius is set on the account's Marketplace location; the value here nudges it wider. Real city comes from each listing.",
+  "searches": [
+    {
+      "city": null,
+      "url": "https://www.facebook.com/marketplace/bellflower/cars?exact=false&radius=65"
+    },
+    {
+      "city": null,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=1"
+    }
+  ],
+
+  "_filters_comment": "A car is kept if it matches ANY entry in 'wanted' (OR logic). Leave 'wanted' empty [] to keep every car. Each wanted entry: all of its set fields must match (AND logic). Fields are optional — omit what you don't care about. Current setup: ANY brand, price >= $6000, mileage <= 120k, year 2016-2025.",
+  "filters": {
+    "wanted": [
+      {
+        "yearMin": 2016,
+        "yearMax": 2025,
+        "priceMin": 6000,
+        "maxMileage": 120000
+      }
+    ],
+    "_includeCities_note": "Only keep cars whose listing city is in this list (your target LA/SB/Riverside/OC cities). Empty [] = keep every city. Matching is case-insensitive.",
+    "includeCities": [
+      "Bellflower","Downey","Norwalk","Cerritos","Lakewood","Long Beach","Paramount","Compton","Artesia","La Mirada","Whittier","Pico Rivera","Santa Fe Springs","La Habra Heights","Bell Gardens","South Gate","Lynwood","Cudahy","Montebello","Commerce","Hawaiian Gardens","Signal Hill","Carson","Bell","Maywood","Huntington Park","Vernon","Los Angeles","Pomona","Diamond Bar","Walnut","Industry","City of Industry","La Puente","West Covina","Covina","Baldwin Park","El Monte","Azusa","Glendora","San Dimas","La Verne","Claremont",
+      "Montclair","Fontana","Ontario","Chino","Chino Hills","Rancho Cucamonga","Upland","Rialto","Colton","San Bernardino","Bloomington","Grand Terrace","Loma Linda","Redlands","Highland","Yucaipa",
+      "Riverside","Corona","Norco","Jurupa Valley","Eastvale","Moreno Valley","Perris","Mira Loma",
+      "Anaheim","Buena Park","Fullerton","La Habra","Brea","Placentia","Yorba Linda","Cypress","Los Alamitos","Stanton","Garden Grove","Orange","Santa Ana","Westminster","Seal Beach","La Palma","Tustin","Villa Park"
+    ],
+    "excludeKeywords": ["wanted", "looking for", "trade only", "parts only", "salvage", "rebuilt", "for parts", "not running",
+      "motorcycle", "motorbike", "scooter", "moped", "ducati", "harley", "harley-davidson", "panigale", "ninja",
+      "cbr", "gsx-r", "gsxr", "yzf", "ktm", "aprilia", "vespa", "sportbike", "sport bike", "moto guzzi",
+      "atv", "utv", "dirt bike", "dirtbike", "quad", "can-am", "can am", "sea-doo", "jet ski", "jetski", "rzr", "trailer only",
+      "motor coach", "motorhome", "winnebago", "thor motor", "coachmen", "jayco", "forest river", "fleetwood", "fifth wheel", "5th wheel", "toy hauler",
+      "beneteau", "sea ray", "bayliner", "pontoon", "boat", "yacht", "sailboat", "jet boat",
+      "sprinter", "metris", "ford transit", "e-transit", "transit connect", "cargo van", "passenger van", "promaster", "traila", "funco",
+      "kenworth", "peterbilt", "freightliner", "cascadia", "t680", "t880", "semi truck", "day cab", "sleeper", "box truck", "cab & chassis", "cab and chassis", "dump truck", "flatbed", "mack truck", "international lonestar", "utility truck", "bucket truck", "tow truck", "reefer"]
+  },
+
+  "maxCarsPerCity": 100,
+
+  "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL cars (any age). maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact 'Listed X ago' time (higher = more get a real time, but slower + higher ban risk).",
+  "maxListingAgeDays": null,
+  "maxDetailFetchesPerRun": 18
+}

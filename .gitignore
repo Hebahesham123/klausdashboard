@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+# env / secrets
+.env
+.env.local
+*.local
+# scraper runtime data (contains your logged-in FB session — never commit)
+scraper/data/
+# next.js
+web/.next/
+web/out/
+# misc
+.DS_Store
+*.log
