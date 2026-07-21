@@ -48,7 +48,15 @@ export async function runOnce() {
     console.log(`  Reading FB time + mileage for ${needTime.length} car(s)...`);
     const timed = await readTimesFor(needTime, { headless });
     await updateTimes(timed);
-    const over = timed.filter((c) => c.mileageValue != null && !keepCar(c, config.filters));
+    // Hide ONLY cars that are over the mileage limit — i.e. they'd pass every
+    // filter if we ignored mileage, but fail once the real mileage is known.
+    // (Never hide for city/price/year/keyword reasons.)
+    const over = timed.filter(
+      (c) =>
+        c.mileageValue != null &&
+        keepCar({ ...c, mileageValue: null }, config.filters) &&
+        !keepCar(c, config.filters)
+    );
     if (over.length > 0) {
       await dismissCars(over.map((c) => c.id));
       console.log(`  Hid ${over.length} car(s) over the mileage limit.`);
