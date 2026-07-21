@@ -53,15 +53,16 @@ export default function CarGrid() {
     await supabase.from('listings').update(fields).eq('id', id);
   }
 
-  // "Remove" = soft delete so the scraper doesn't re-add it next run.
+  // "Remove" = permanent manual removal. Uses its OWN flag so no scraper repair
+  // or filter logic ever brings it back.
   async function removeCar(id) {
     setCars((prev) => prev.filter((c) => c.id !== id));
-    await supabase.from('listings').update({ dismissed: true }).eq('id', id);
+    await supabase.from('listings').update({ removed: true }).eq('id', id);
   }
 
   const filtered = useMemo(() => {
     const list = cars.filter((c) => {
-      if (c.dismissed) return false;
+      if (c.dismissed || c.removed) return false;
       if (city !== 'All' && c.city !== city) return false;
       if (onlyNew && !c.is_new) return false;
       if (agentFilter === 'Unassigned' && c.agent) return false;
@@ -99,10 +100,10 @@ export default function CarGrid() {
     return sorted;
   }, [cars, city, q, onlyNew, sort, agentFilter, seller]);
 
-  const newCount = cars.filter((c) => c.is_new && !c.dismissed).length;
+  const newCount = cars.filter((c) => c.is_new && !c.dismissed && !c.removed).length;
 
   const cityOptions = useMemo(() => {
-    const set = new Set(cars.filter((c) => !c.dismissed && c.city).map((c) => c.city));
+    const set = new Set(cars.filter((c) => !c.dismissed && !c.removed && c.city).map((c) => c.city));
     return ['All', ...Array.from(set).sort()];
   }, [cars]);
 
