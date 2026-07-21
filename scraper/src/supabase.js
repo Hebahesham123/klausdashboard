@@ -20,18 +20,18 @@ export const supabase = createClient(url, key, {
  */
 export async function getExistingIds() {
   const all = new Set();
-  const checked = new Set(); // cars whose detail page we've already read (mileage set)
+  const checked = new Set(); // cars whose detail page we've fully read (mileage + dealer)
   const pageSize = 1000;
   for (let from = 0; ; from += pageSize) {
     const { data, error } = await supabase
       .from('listings')
-      .select('id, mileage')
+      .select('id, mileage, is_dealer')
       .range(from, from + pageSize - 1);
     if (error) throw error;
     if (!data || data.length === 0) break;
     for (const row of data) {
       all.add(row.id);
-      if (row.mileage) checked.add(row.id);
+      if (row.mileage && row.is_dealer != null) checked.add(row.id);
     }
     if (data.length < pageSize) break;
   }
@@ -99,6 +99,7 @@ export async function updateTimes(cars) {
   for (const c of cars) {
     const patch = { mileage: c.mileage || 'Not listed' }; // always mark as checked
     if (c.postedAt) { patch.posted_text = c.postedText; patch.posted_at = c.postedAt; }
+    if (c.isDealer != null) patch.is_dealer = c.isDealer;
     await supabase.from('listings').update(patch).eq('id', c.id);
   }
 }

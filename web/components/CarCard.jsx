@@ -28,6 +28,7 @@ export default function CarCard({ car, onUpdate, onRemove }) {
   return (
     <div className={`card status-${status.toLowerCase()}`}>
       {car.is_new && <span className="badge-new">NEW</span>}
+      {car.is_dealer === true && <span className="badge-dealer">DEALER</span>}
       <button className="remove" title="Remove this car" onClick={() => onRemove(car.id)}>✕</button>
 
       <a className="imgwrap" href={car.url} target="_blank" rel="noopener noreferrer">

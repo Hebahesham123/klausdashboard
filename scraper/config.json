@@ -30,7 +30,7 @@
         "yearMin": 2016,
         "yearMax": 2025,
         "priceMin": 6000,
-        "maxMileage": 120000
+        "maxMileage": 110000
       }
     ],
     "_includeCities_note": "Only keep cars whose listing city is in this list. Empty [] = keep every city (whole radius area). Currently empty per user request (whole 65-mile area).",

@@ -14,6 +14,7 @@ export default function CarGrid() {
   const [onlyNew, setOnlyNew] = useState(false);
   const [sort, setSort] = useState('newest');
   const [agentFilter, setAgentFilter] = useState('All agents');
+  const [seller, setSeller] = useState('all');
 
   // Initial load
   useEffect(() => {
@@ -65,6 +66,8 @@ export default function CarGrid() {
       if (onlyNew && !c.is_new) return false;
       if (agentFilter === 'Unassigned' && c.agent) return false;
       if (agentFilter !== 'All agents' && agentFilter !== 'Unassigned' && c.agent !== agentFilter) return false;
+      if (seller === 'private' && c.is_dealer === true) return false;
+      if (seller === 'dealer' && c.is_dealer !== true) return false;
       if (q) {
         const hay = `${c.title || ''} ${c.city || ''} ${c.price_text || ''} ${c.notes || ''}`.toLowerCase();
         if (!hay.includes(q.toLowerCase())) return false;
@@ -94,7 +97,7 @@ export default function CarGrid() {
         break;
     }
     return sorted;
-  }, [cars, city, q, onlyNew, sort, agentFilter]);
+  }, [cars, city, q, onlyNew, sort, agentFilter, seller]);
 
   const newCount = cars.filter((c) => c.is_new && !c.dismissed).length;
 
@@ -118,6 +121,11 @@ export default function CarGrid() {
         </select>
         <select value={agentFilter} onChange={(e) => setAgentFilter(e.target.value)} title="Filter by agent">
           {AGENTS.map((a) => <option key={a} value={a}>{a}</option>)}
+        </select>
+        <select value={seller} onChange={(e) => setSeller(e.target.value)} title="Seller type">
+          <option value="all">All sellers</option>
+          <option value="private">Private only (hide dealers)</option>
+          <option value="dealer">Dealers only</option>
         </select>
         <input
           type="text"

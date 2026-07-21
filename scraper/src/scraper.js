@@ -77,17 +77,21 @@ async function fetchDetail(context, url) {
         if (!mileage && s.length < 45 && miRe.test(s)) mileage = s.match(miRe)[0];
         if (listed && mileage) break;
       }
+      const bodyText = document.body.innerText || '';
       // Fallback: scan the whole page text (catches mileage in the description).
       if (!mileage) {
-        const body = document.body.innerText || '';
-        const m = body.match(/\d[\d.,]{2,}\s*(k\s*)?(miles?|millas?)\b/i)
-               || body.match(/\d+\s*k\s*(miles?|millas?)\b/i);
+        const m = bodyText.match(/\d[\d.,]{2,}\s*(k\s*)?(miles?|millas?)\b/i)
+               || bodyText.match(/\d+\s*k\s*(miles?|millas?)\b/i);
         if (m) mileage = m[0];
       }
-      return { listed, mileage };
+      // Dealer detection: FB dealer listings show a "Dealership" label and
+      // financing options; private sellers don't.
+      const low = bodyText.toLowerCase();
+      const dealer = low.includes('dealership') || /financ(e|ing)/.test(low);
+      return { listed, mileage, dealer };
     });
   } catch {
-    return { listed: null, mileage: null };
+    return { listed: null, mileage: null, dealer: null };
   } finally {
     await page.close();
   }
@@ -212,7 +216,7 @@ export async function readTimesFor(cars, { headless = true } = {}) {
   return withContext(headless, async (context) => {
     const updated = [];
     for (const c of cars) {
-      const { listed, mileage } = await fetchDetail(context, c.url);
+      const { listed, mileage, dealer } = await fetchDetail(context, c.url);
       const { text, at } = parseListed(listed);
       c.postedText = text;
       c.postedAt = at;
@@ -222,6 +226,7 @@ export async function readTimesFor(cars, { headless = true } = {}) {
       } else if (!c.mileage) {
         c.mileage = 'Not listed'; // detail checked, seller gave no mileage
       }
+      if (dealer != null) c.isDealer = dealer;
       updated.push(c); // always — records that we checked this car's page
       await new Promise((r) => setTimeout(r, 400 + Math.random() * 400));
     }
