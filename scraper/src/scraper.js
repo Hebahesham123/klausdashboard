@@ -18,14 +18,14 @@ async function autoScroll(page, maxRounds = 60) {
   let last = 0;
   let stagnant = 0;
   for (let i = 0; i < maxRounds; i++) {
-    await page.mouse.wheel(0, 3000);
-    await page.waitForTimeout(1100 + Math.floor(Math.random() * 700));
+    await page.mouse.wheel(0, 3200);
+    await page.waitForTimeout(750 + Math.floor(Math.random() * 450));
     const count = await page.evaluate(
       () => document.querySelectorAll('a[href*="/marketplace/item/"]').length
     );
     if (count <= last) {
       stagnant += 1;
-      if (stagnant >= 5) break; // no new cars for 5 rounds => reached the end
+      if (stagnant >= 3) break; // no new cars for 3 rounds => reached the end
     } else {
       stagnant = 0;
     }
@@ -61,10 +61,10 @@ async function fetchDetail(context, url) {
   const page = await context.newPage();
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await page.waitForTimeout(1200 + Math.random() * 800);
+    await page.waitForTimeout(800 + Math.random() * 500);
     // scroll a bit so the "About this vehicle" (mileage) section renders
     await page.mouse.wheel(0, 1200);
-    await page.waitForTimeout(900);
+    await page.waitForTimeout(600);
     return await page.evaluate(() => {
       let listed = null;
       let mileage = null;
@@ -98,7 +98,7 @@ async function scrapeCity(context, search) {
   const cars = [];
   try {
     await page.goto(search.url, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForTimeout(3500);
+    await page.waitForTimeout(2500);
 
     if (page.url().includes('/login') || (await page.locator('input[name="email"]').count()) > 0) {
       throw new Error('Not logged in — run `npm run login` again to refresh the Facebook session.');
@@ -195,7 +195,7 @@ export async function scrapeGrids(config, { headless = true } = {}) {
       } catch (err) {
         console.error(`  ${search.city}: ${err.message}`);
       }
-      await new Promise((r) => setTimeout(r, 2000 + Math.random() * 2000));
+      await new Promise((r) => setTimeout(r, 1000 + Math.random() * 1200));
     }
     const byId = new Map();
     for (const c of all) if (!byId.has(c.id)) byId.set(c.id, c);
@@ -223,7 +223,7 @@ export async function readTimesFor(cars, { headless = true } = {}) {
         c.mileage = 'Not listed'; // detail checked, seller gave no mileage
       }
       updated.push(c); // always — records that we checked this car's page
-      await new Promise((r) => setTimeout(r, 700 + Math.random() * 700));
+      await new Promise((r) => setTimeout(r, 400 + Math.random() * 400));
     }
     return updated;
   });
