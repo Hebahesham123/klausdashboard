@@ -12,10 +12,24 @@ export function hasSession() {
 }
 export const SESSION_PATH = SESSION_FILE;
 
-async function autoScroll(page, rounds = 12) {
-  for (let i = 0; i < rounds; i++) {
-    await page.mouse.wheel(0, 2400);
+// Infinite scroll: keep scrolling until no new listings load for several
+// rounds in a row (bottom reached), capped by maxRounds as a safety limit.
+async function autoScroll(page, maxRounds = 60) {
+  let last = 0;
+  let stagnant = 0;
+  for (let i = 0; i < maxRounds; i++) {
+    await page.mouse.wheel(0, 3000);
     await page.waitForTimeout(1100 + Math.floor(Math.random() * 700));
+    const count = await page.evaluate(
+      () => document.querySelectorAll('a[href*="/marketplace/item/"]').length
+    );
+    if (count <= last) {
+      stagnant += 1;
+      if (stagnant >= 5) break; // no new cars for 5 rounds => reached the end
+    } else {
+      stagnant = 0;
+    }
+    last = count;
   }
 }
 
@@ -42,23 +56,26 @@ export function parseListed(text) {
   return { text: clean, at: null };
 }
 
-/** Read the "Listed X ago ..." line from a listing detail page. */
-async function fetchListedText(context, url) {
+/** Read "Listed X ago" AND the mileage ("Driven 84,000 miles") from a detail page. */
+async function fetchDetail(context, url) {
   const page = await context.newPage();
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(1500 + Math.random() * 1000);
-    const txt = await page.evaluate(() => {
-      const nodes = Array.from(document.querySelectorAll('span, div, abbr'));
+    return await page.evaluate(() => {
+      let listed = null;
+      let mileage = null;
+      const nodes = Array.from(document.querySelectorAll('span, div, abbr, li'));
       for (const el of nodes) {
         const s = (el.textContent || '').trim();
-        if (/^listed\s+/i.test(s) && s.length < 80) return s;
+        if (!listed && /^listed\s+/i.test(s) && s.length < 80) listed = s;
+        if (!mileage && /\b[\d,.]+\s*(k\s*)?miles?\b/i.test(s) && s.length < 40) mileage = s;
+        if (listed && mileage) break;
       }
-      return null;
+      return { listed, mileage };
     });
-    return txt;
   } catch {
-    return null;
+    return { listed: null, mileage: null };
   } finally {
     await page.close();
   }
@@ -75,7 +92,7 @@ async function scrapeCity(context, search) {
       throw new Error('Not logged in — run `npm run login` again to refresh the Facebook session.');
     }
 
-    await autoScroll(page);
+    await autoScroll(page, search.scrolls || 12);
 
     const raw = await page.evaluate(() => {
       const out = [];
@@ -170,21 +187,25 @@ export async function scrapeGrids(config, { headless = true } = {}) {
 }
 
 /**
- * SLOW pass: open each given car's page to read Facebook's real "Listed X ago".
- * Mutates each car (postedText/postedAt) and returns the ones that got a time.
+ * SLOW pass: open each given car's page to read the real "Listed X ago" AND
+ * the mileage. Mutates each car and returns the ones that got new detail.
  */
 export async function readTimesFor(cars, { headless = true } = {}) {
   if (cars.length === 0) return [];
   return withContext(headless, async (context) => {
-    const timed = [];
+    const updated = [];
     for (const c of cars) {
-      const listed = await fetchListedText(context, c.url);
+      const { listed, mileage } = await fetchDetail(context, c.url);
       const { text, at } = parseListed(listed);
       c.postedText = text;
       c.postedAt = at;
-      if (at) timed.push(c);
+      if (mileage) {
+        c.mileage = mileage;
+        c.mileageValue = parseMileage(mileage);
+      }
+      if (at || mileage) updated.push(c);
       await new Promise((r) => setTimeout(r, 700 + Math.random() * 700));
     }
-    return timed;
+    return updated;
   });
 }

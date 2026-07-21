@@ -3,11 +3,23 @@
   "searches": [
     {
       "city": null,
+      "scrolls": 30,
       "url": "https://www.facebook.com/marketplace/bellflower/cars?exact=false&radius=65"
     },
     {
       "city": null,
-      "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=1"
+      "scrolls": 30,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 20,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=truck&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 20,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=suv&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
     }
   ],
 
@@ -21,14 +33,10 @@
         "maxMileage": 120000
       }
     ],
-    "_includeCities_note": "Only keep cars whose listing city is in this list (your target LA/SB/Riverside/OC cities). Empty [] = keep every city. Matching is case-insensitive.",
-    "includeCities": [
-      "Bellflower","Downey","Norwalk","Cerritos","Lakewood","Long Beach","Paramount","Compton","Artesia","La Mirada","Whittier","Pico Rivera","Santa Fe Springs","La Habra Heights","Bell Gardens","South Gate","Lynwood","Cudahy","Montebello","Commerce","Hawaiian Gardens","Signal Hill","Carson","Bell","Maywood","Huntington Park","Vernon","Los Angeles","Pomona","Diamond Bar","Walnut","Industry","City of Industry","La Puente","West Covina","Covina","Baldwin Park","El Monte","Azusa","Glendora","San Dimas","La Verne","Claremont",
-      "Montclair","Fontana","Ontario","Chino","Chino Hills","Rancho Cucamonga","Upland","Rialto","Colton","San Bernardino","Bloomington","Grand Terrace","Loma Linda","Redlands","Highland","Yucaipa",
-      "Riverside","Corona","Norco","Jurupa Valley","Eastvale","Moreno Valley","Perris","Mira Loma",
-      "Anaheim","Buena Park","Fullerton","La Habra","Brea","Placentia","Yorba Linda","Cypress","Los Alamitos","Stanton","Garden Grove","Orange","Santa Ana","Westminster","Seal Beach","La Palma","Tustin","Villa Park"
-    ],
+    "_includeCities_note": "Only keep cars whose listing city is in this list. Empty [] = keep every city (whole radius area). Currently empty per user request (whole 65-mile area).",
+    "includeCities": [],
     "excludeKeywords": ["wanted", "looking for", "trade only", "parts only", "salvage", "rebuilt", "for parts", "not running",
+      "locksmith", "key fob", "car keys", "key replacement", "cash for cars", "cars for sale", "we buy cars", "auto lock",
       "motorcycle", "motorbike", "scooter", "moped", "ducati", "harley", "harley-davidson", "panigale", "ninja",
       "cbr", "gsx-r", "gsxr", "yzf", "ktm", "aprilia", "vespa", "sportbike", "sport bike", "moto guzzi",
       "atv", "utv", "dirt bike", "dirtbike", "quad", "can-am", "can am", "sea-doo", "jet ski", "jetski", "rzr", "trailer only",
@@ -38,7 +46,7 @@
       "kenworth", "peterbilt", "freightliner", "cascadia", "t680", "t880", "semi truck", "day cab", "sleeper", "box truck", "cab & chassis", "cab and chassis", "dump truck", "flatbed", "mack truck", "international lonestar", "utility truck", "bucket truck", "tow truck", "reefer"]
   },
 
-  "maxCarsPerCity": 100,
+  "maxCarsPerCity": 0,
 
   "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL cars (any age). maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact 'Listed X ago' time (higher = more get a real time, but slower + higher ban risk).",
   "maxListingAgeDays": null,

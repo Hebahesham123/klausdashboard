@@ -88,13 +88,13 @@ export async function saveCars(cars, existingIds) {
   return newCars;
 }
 
-/** Write the real listing time onto cars we just read it for. */
+/** Write the real listing time and mileage onto cars we just read from detail pages. */
 export async function updateTimes(cars) {
   for (const c of cars) {
-    if (!c.postedAt) continue;
-    await supabase
-      .from('listings')
-      .update({ posted_text: c.postedText, posted_at: c.postedAt })
-      .eq('id', c.id);
+    const patch = {};
+    if (c.postedAt) { patch.posted_text = c.postedText; patch.posted_at = c.postedAt; }
+    if (c.mileage) { patch.mileage = c.mileage; }
+    if (Object.keys(patch).length === 0) continue;
+    await supabase.from('listings').update(patch).eq('id', c.id);
   }
 }

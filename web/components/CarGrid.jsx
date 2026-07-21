@@ -23,7 +23,7 @@ export default function CarGrid() {
         .from('listings')
         .select('*')
         .order('first_seen', { ascending: false })
-        .limit(2000);
+        .limit(5000);
       if (active) {
         if (!error && data) setCars(data);
         setLoading(false);

@@ -44,8 +44,10 @@ export default function CarCard({ car, onUpdate, onRemove }) {
           {car.title || 'Car listing'}
         </a>
         <div className="meta">
-          {car.mileage && <span>{car.mileage}</span>}
-          {car.city && <span>{car.city}</span>}
+          {car.city && <span>📍 {car.city}</span>}
+        </div>
+        <div className="miles">
+          {car.mileage ? `🚗 ${car.mileage}` : '🚗 mileage pending…'}
         </div>
         {car.posted_text ? (
           <div className="found" title={`Detected by watcher ${found}`}>🕒 {car.posted_text}</div>
