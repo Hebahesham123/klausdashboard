@@ -49,9 +49,11 @@ export default function CarCard({ car, onUpdate, onRemove }) {
         {car.mileage && car.mileage !== 'Not listed' && (
           <div className="miles">🚗 {car.mileage}</div>
         )}
-        <div className="found">
-          🕒 {car.posted_text || `found ${found}`}
-        </div>
+        {car.posted_text ? (
+          <div className="found">🕒 {car.posted_text}</div>
+        ) : (
+          <div className="found pending">⏳ reading time…</div>
+        )}
 
         <div className="assign">
           <label>

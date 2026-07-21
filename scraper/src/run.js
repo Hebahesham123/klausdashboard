@@ -15,34 +15,29 @@ export function loadConfig() {
 
 /**
  * One cycle:
- *  1. Fast grid scrape → save immediately so cars appear on the dashboard NOW.
- *  2. Slow pass → open matching cars' pages to read the real "Listed X ago",
- *     newest first, and update them (dashboard fills the times in live).
+ *  1. Grid scrape → save immediately so new cars appear on the dashboard NOW
+ *     (showing "reading time…" until their page is read).
+ *  2. Read pages for unchecked cars — BRAND-NEW first — to fill in the real
+ *     "Listed X ago" + mileage, and hide any over the mileage limit.
  */
 export async function runOnce() {
   const config = loadConfig();
   const headless = process.env.HEADLESS !== 'false';
+  const cap = config.maxDetailFetchesPerRun ?? 30;
 
   console.log(`[${new Date().toLocaleTimeString()}] Scraping ${config.searches.length} searches...`);
 
   const { all: existingIds, checked: checkedIds } = await getExistingIds();
 
-  // 1) FAST: grid scrape + save right away.
   const grid = await scrapeGrids(config, { headless });
   const kept = grid.filter((c) => keepCar(c, config.filters));
   console.log(`  ${grid.length} scraped, ${kept.length} match your filters.`);
 
-  const newCars = await saveCars(kept, existingIds); // <-- cars visible on dashboard here
-  if (newCars.length > 0) {
-    console.log(`  🚗 ${newCars.length} new car(s) added — now reading their FB times...`);
-  }
+  // 1) SAVE NOW — cars appear immediately (real time fills in next).
+  const newCars = await saveCars(kept, existingIds);
+  if (newCars.length > 0) console.log(`  🚗 ${newCars.length} new car(s) added — reading their FB times...`);
 
-  // 2) SLOW (optional): open each car's page to read the real "Listed X ago"
-  //    and mileage. Skipped entirely when readDetails is false so all cars just
-  //    appear instantly with no extra Facebook page-loads.
-  const cap = config.maxDetailFetchesPerRun ?? 30;
-  // Read pages for cars we haven't checked — BRAND-NEW cars first (so their real
-  // FB time shows up fast), then work through the older backlog.
+  // 2) Read pages for unchecked cars, brand-new ones first.
   const needTime = config.readDetails === false
     ? []
     : kept
@@ -50,26 +45,17 @@ export async function runOnce() {
         .sort((a, b) => (existingIds.has(a.id) ? 1 : 0) - (existingIds.has(b.id) ? 1 : 0))
         .slice(0, cap);
   if (needTime.length > 0) {
-    console.log(`  Reading listing time + mileage for ${needTime.length} car(s)...`);
+    console.log(`  Reading FB time + mileage for ${needTime.length} car(s)...`);
     const timed = await readTimesFor(needTime, { headless });
     await updateTimes(timed);
-    console.log(`  Filled in ${timed.length} listing time(s).`);
-
-    // Now that mileage is known for these, hide any that fail the filters
-    // (e.g. mileage over the 120k limit). Hidden, not deleted.
-    const nowFailing = timed.filter((c) => c.mileageValue != null && !keepCar(c, config.filters));
-    if (nowFailing.length > 0) {
-      await dismissCars(nowFailing.map((c) => c.id));
-      console.log(`  Hid ${nowFailing.length} car(s) over the mileage limit.`);
+    const over = timed.filter((c) => c.mileageValue != null && !keepCar(c, config.filters));
+    if (over.length > 0) {
+      await dismissCars(over.map((c) => c.id));
+      console.log(`  Hid ${over.length} car(s) over the mileage limit.`);
     }
   }
 
-  // Email the new cars (now carrying their real times where available).
-  if (newCars.length > 0) {
-    for (const c of newCars) console.log(`     - ${c.priceText || ''} ${c.title || ''} (${c.city}) — ${c.postedText || 'time pending'}`);
-    await sendNewCarsEmail(newCars);
-  } else {
-    console.log('  No new cars this run.');
-  }
+  if (newCars.length > 0) await sendNewCarsEmail(newCars);
+  else console.log('  No new cars this run.');
   return newCars.length;
 }
