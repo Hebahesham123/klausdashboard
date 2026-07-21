@@ -3,22 +3,22 @@
   "searches": [
     {
       "city": null,
-      "scrolls": 40,
+      "scrolls": 20,
       "url": "https://www.facebook.com/marketplace/bellflower/cars?exact=false&radius=65"
     },
     {
       "city": null,
-      "scrolls": 40,
+      "scrolls": 20,
       "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
     },
     {
       "city": null,
-      "scrolls": 40,
+      "scrolls": 20,
       "url": "https://www.facebook.com/marketplace/bellflower/search?query=truck&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
     },
     {
       "city": null,
-      "scrolls": 40,
+      "scrolls": 20,
       "url": "https://www.facebook.com/marketplace/bellflower/search?query=suv&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
     }
   ],
@@ -50,8 +50,8 @@
 
   "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL cars (any age). maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact 'Listed X ago' time (higher = more get a real time, but slower + higher ban risk).",
   "maxListingAgeDays": null,
-  "maxDetailFetchesPerRun": 18,
+  "maxDetailFetchesPerRun": 25,
 
   "_readDetails_note": "false = skip opening each car's page (no mileage, no exact 'Listed X ago'). Much faster, all cars appear instantly, far lower ban risk. Newest-found cars sort to the top.",
-  "readDetails": false
+  "readDetails": true
 }
