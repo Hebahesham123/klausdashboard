@@ -37,10 +37,13 @@ export async function runOnce() {
     console.log(`  🚗 ${newCars.length} new car(s) added — now reading their FB times...`);
   }
 
-  // 2) SLOW: read real listing time for matching cars that don't have one yet,
-  //    newest first (fresh-pass cars come first in the scrape order).
+  // 2) SLOW (optional): open each car's page to read the real "Listed X ago"
+  //    and mileage. Skipped entirely when readDetails is false so all cars just
+  //    appear instantly with no extra Facebook page-loads.
   const cap = config.maxDetailFetchesPerRun ?? 30;
-  const needTime = kept.filter((c) => !checkedIds.has(c.id)).slice(0, cap);
+  const needTime = config.readDetails === false
+    ? []
+    : kept.filter((c) => !checkedIds.has(c.id)).slice(0, cap);
   if (needTime.length > 0) {
     console.log(`  Reading listing time + mileage for ${needTime.length} car(s)...`);
     const timed = await readTimesFor(needTime, { headless });
