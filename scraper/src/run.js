@@ -41,9 +41,14 @@ export async function runOnce() {
   //    and mileage. Skipped entirely when readDetails is false so all cars just
   //    appear instantly with no extra Facebook page-loads.
   const cap = config.maxDetailFetchesPerRun ?? 30;
+  // Read pages for cars we haven't checked — BRAND-NEW cars first (so their real
+  // FB time shows up fast), then work through the older backlog.
   const needTime = config.readDetails === false
     ? []
-    : kept.filter((c) => !checkedIds.has(c.id)).slice(0, cap);
+    : kept
+        .filter((c) => !checkedIds.has(c.id))
+        .sort((a, b) => (existingIds.has(a.id) ? 1 : 0) - (existingIds.has(b.id) ? 1 : 0))
+        .slice(0, cap);
   if (needTime.length > 0) {
     console.log(`  Reading listing time + mileage for ${needTime.length} car(s)...`);
     const timed = await readTimesFor(needTime, { headless });
