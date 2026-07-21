@@ -21,7 +21,7 @@ const { data } = await sb
   .from('listings')
   .select('id, url, title, mileage')
   .eq('dismissed', false)
-  .is('mileage', null);
+  .is('is_dealer', null);
 
 if (!data || data.length === 0) {
   console.log('Nothing to backfill.');

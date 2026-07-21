@@ -14,7 +14,7 @@ export default function CarGrid() {
   const [onlyNew, setOnlyNew] = useState(false);
   const [sort, setSort] = useState('newest');
   const [agentFilter, setAgentFilter] = useState('All agents');
-  const [seller, setSeller] = useState('all');
+  const [seller, setSeller] = useState('private');
 
   // Initial load
   useEffect(() => {
