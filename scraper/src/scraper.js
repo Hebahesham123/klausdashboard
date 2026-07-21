@@ -60,8 +60,8 @@ export function parseListed(text) {
 async function fetchDetail(context, url) {
   const page = await context.newPage();
   try {
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForTimeout(1500 + Math.random() * 1000);
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await page.waitForTimeout(1200 + Math.random() * 800);
     // scroll a bit so the "About this vehicle" (mileage) section renders
     await page.mouse.wheel(0, 1200);
     await page.waitForTimeout(900);
