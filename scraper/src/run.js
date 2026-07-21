@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { scrapeGrids, readTimesFor } from './scraper.js';
 import { keepCar } from './filters.js';
-import { getExistingIds, saveCars, updateTimes } from './supabase.js';
+import { getExistingIds, saveCars, updateTimes, dismissCars } from './supabase.js';
 import { sendNewCarsEmail } from './email.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -25,7 +25,7 @@ export async function runOnce() {
 
   console.log(`[${new Date().toLocaleTimeString()}] Scraping ${config.searches.length} searches...`);
 
-  const { all: existingIds, timed: timedIds } = await getExistingIds();
+  const { all: existingIds, checked: checkedIds } = await getExistingIds();
 
   // 1) FAST: grid scrape + save right away.
   const grid = await scrapeGrids(config, { headless });
@@ -40,12 +40,20 @@ export async function runOnce() {
   // 2) SLOW: read real listing time for matching cars that don't have one yet,
   //    newest first (fresh-pass cars come first in the scrape order).
   const cap = config.maxDetailFetchesPerRun ?? 30;
-  const needTime = kept.filter((c) => !timedIds.has(c.id)).slice(0, cap);
+  const needTime = kept.filter((c) => !checkedIds.has(c.id)).slice(0, cap);
   if (needTime.length > 0) {
-    console.log(`  Reading Facebook listing time for ${needTime.length} car(s)...`);
+    console.log(`  Reading listing time + mileage for ${needTime.length} car(s)...`);
     const timed = await readTimesFor(needTime, { headless });
     await updateTimes(timed);
     console.log(`  Filled in ${timed.length} listing time(s).`);
+
+    // Now that mileage is known for these, hide any that fail the filters
+    // (e.g. mileage over the 120k limit). Hidden, not deleted.
+    const nowFailing = timed.filter((c) => c.mileageValue != null && !keepCar(c, config.filters));
+    if (nowFailing.length > 0) {
+      await dismissCars(nowFailing.map((c) => c.id));
+      console.log(`  Hid ${nowFailing.length} car(s) over the mileage limit.`);
+    }
   }
 
   // Email the new cars (now carrying their real times where available).

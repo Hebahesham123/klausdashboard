@@ -62,15 +62,27 @@ async function fetchDetail(context, url) {
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     await page.waitForTimeout(1500 + Math.random() * 1000);
+    // scroll a bit so the "About this vehicle" (mileage) section renders
+    await page.mouse.wheel(0, 1200);
+    await page.waitForTimeout(900);
     return await page.evaluate(() => {
       let listed = null;
       let mileage = null;
+      const miRe = /(driven\s+)?\d[\d.,]*\s*(k\s*)?(miles?|millas?)\b/i;
       const nodes = Array.from(document.querySelectorAll('span, div, abbr, li'));
       for (const el of nodes) {
+        if (el.children.length > 1) continue;
         const s = (el.textContent || '').trim();
         if (!listed && /^listed\s+/i.test(s) && s.length < 80) listed = s;
-        if (!mileage && /\b[\d,.]+\s*(k\s*)?miles?\b/i.test(s) && s.length < 40) mileage = s;
+        if (!mileage && s.length < 45 && miRe.test(s)) mileage = s.match(miRe)[0];
         if (listed && mileage) break;
+      }
+      // Fallback: scan the whole page text (catches mileage in the description).
+      if (!mileage) {
+        const body = document.body.innerText || '';
+        const m = body.match(/\d[\d.,]{2,}\s*(k\s*)?(miles?|millas?)\b/i)
+               || body.match(/\d+\s*k\s*(miles?|millas?)\b/i);
+        if (m) mileage = m[0];
       }
       return { listed, mileage };
     });
@@ -124,13 +136,18 @@ async function scrapeCity(context, search) {
         candidates.sort((a, b) => b.length - a.length)[0] ||
         null;
 
+      // Mileage: prefer a dedicated line, else pull it from the title
+      // (many sellers write "158.000 Millas" / "84k miles" in the title).
+      const miVal = parseMileage(mileageLine) ?? parseMileage(titleLine);
+      const miText = mileageLine || (miVal != null ? `${miVal.toLocaleString()} miles` : null);
+
       cars.push({
         id: r.id,
         title: titleLine,
         priceText: priceLine,
         priceValue: parsePrice(priceLine),
-        mileage: mileageLine,
-        mileageValue: parseMileage(mileageLine),
+        mileage: miText,
+        mileageValue: miVal,
         year: parseYear(titleLine),
         city: cityClean || search.city,
         imageUrl: r.imageUrl,
@@ -202,8 +219,10 @@ export async function readTimesFor(cars, { headless = true } = {}) {
       if (mileage) {
         c.mileage = mileage;
         c.mileageValue = parseMileage(mileage);
+      } else if (!c.mileage) {
+        c.mileage = 'Not listed'; // detail checked, seller gave no mileage
       }
-      if (at || mileage) updated.push(c);
+      updated.push(c); // always — records that we checked this car's page
       await new Promise((r) => setTimeout(r, 700 + Math.random() * 700));
     }
     return updated;

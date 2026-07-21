@@ -47,7 +47,11 @@ export default function CarCard({ car, onUpdate, onRemove }) {
           {car.city && <span>📍 {car.city}</span>}
         </div>
         <div className="miles">
-          {car.mileage ? `🚗 ${car.mileage}` : '🚗 mileage pending…'}
+          {!car.mileage
+            ? '🚗 reading mileage…'
+            : car.mileage === 'Not listed'
+              ? '🚗 mileage not posted'
+              : `🚗 ${car.mileage}`}
         </div>
         {car.posted_text ? (
           <div className="found" title={`Detected by watcher ${found}`}>🕒 {car.posted_text}</div>

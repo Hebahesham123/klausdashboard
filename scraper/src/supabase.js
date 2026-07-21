@@ -20,22 +20,22 @@ export const supabase = createClient(url, key, {
  */
 export async function getExistingIds() {
   const all = new Set();
-  const timed = new Set();
+  const checked = new Set(); // cars whose detail page we've already read (mileage set)
   const pageSize = 1000;
   for (let from = 0; ; from += pageSize) {
     const { data, error } = await supabase
       .from('listings')
-      .select('id, posted_at')
+      .select('id, mileage')
       .range(from, from + pageSize - 1);
     if (error) throw error;
     if (!data || data.length === 0) break;
     for (const row of data) {
       all.add(row.id);
-      if (row.posted_at) timed.add(row.id);
+      if (row.mileage) checked.add(row.id);
     }
     if (data.length < pageSize) break;
   }
-  return { all, timed };
+  return { all, checked };
 }
 
 /**
@@ -88,13 +88,17 @@ export async function saveCars(cars, existingIds) {
   return newCars;
 }
 
+/** Hide cars (soft delete) — e.g. ones found to exceed the mileage limit. Not truly removed. */
+export async function dismissCars(ids) {
+  if (!ids || ids.length === 0) return;
+  await supabase.from('listings').update({ dismissed: true }).in('id', ids);
+}
+
 /** Write the real listing time and mileage onto cars we just read from detail pages. */
 export async function updateTimes(cars) {
   for (const c of cars) {
-    const patch = {};
+    const patch = { mileage: c.mileage || 'Not listed' }; // always mark as checked
     if (c.postedAt) { patch.posted_text = c.postedText; patch.posted_at = c.postedAt; }
-    if (c.mileage) { patch.mileage = c.mileage; }
-    if (Object.keys(patch).length === 0) continue;
     await supabase.from('listings').update(patch).eq('id', c.id);
   }
 }

@@ -7,14 +7,24 @@ export function parsePrice(text) {
   return m ? parseInt(m[1], 10) : null;
 }
 
-/** "84K miles" -> 84000 ; "126,000 miles" -> 126000 ; null if none */
+/**
+ * Parse mileage from various formats:
+ *   "84K miles" / "84k millas"   -> 84000
+ *   "126,000 miles"              -> 126000
+ *   "158.000 Millas" (euro/es)   -> 158000
+ *   "Driven 84,000 miles"        -> 84000
+ * Returns null if no mileage found.
+ */
 export function parseMileage(text) {
   if (!text) return null;
-  const t = String(text).toLowerCase().replace(/,/g, '');
-  const k = t.match(/(\d+(?:\.\d+)?)\s*k\s*miles?/);
-  if (k) return Math.round(parseFloat(k[1]) * 1000);
-  const n = t.match(/(\d{3,7})\s*miles?/);
-  return n ? parseInt(n[1], 10) : null;
+  const t = String(text).toLowerCase();
+  // "84k" / "84.5k" (optionally followed by miles/millas)
+  let m = t.match(/(\d+(?:[.,]\d+)?)\s*k\b\s*(?:miles?|millas?|mi\b)?/);
+  if (m && /k/.test(m[0])) return Math.round(parseFloat(m[1].replace(',', '.')) * 1000);
+  // "158,000 miles" / "158.000 millas" / "84000 mi" / "Driven 126,000 miles"
+  m = t.match(/(\d[\d.,]{2,})\s*(?:miles?|millas?|mi\b)/);
+  if (m) return parseInt(m[1].replace(/[.,]/g, ''), 10);
+  return null;
 }
 
 /** first 19xx/20xx in the title -> number ; null if none */

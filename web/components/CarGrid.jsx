@@ -72,14 +72,21 @@ export default function CarGrid() {
       return true;
     });
 
-    // Use Facebook's real listing time when we have it, else when we first saw it.
-    const ts = (c) => new Date(c.posted_at || c.first_seen || 0).getTime();
+    // Real Facebook listing time (null until we've read it from the car's page).
+    const pt = (c) => (c.posted_at ? new Date(c.posted_at).getTime() : null);
+    const seen = (c) => new Date(c.first_seen || 0).getTime();
     const price = (c) => (c.price_value == null ? Infinity : c.price_value);
 
     const sorted = [...list];
     switch (sort) {
       case 'oldest':
-        sorted.sort((a, b) => ts(a) - ts(b));
+        // known times ascending; cars without a known time go last
+        sorted.sort((a, b) => {
+          if (pt(a) == null && pt(b) == null) return seen(a) - seen(b);
+          if (pt(a) == null) return 1;
+          if (pt(b) == null) return -1;
+          return pt(a) - pt(b);
+        });
         break;
       case 'price-low':
         sorted.sort((a, b) => price(a) - price(b));
@@ -89,7 +96,13 @@ export default function CarGrid() {
         break;
       case 'newest':
       default:
-        sorted.sort((a, b) => ts(b) - ts(a));
+        // known times newest-first; cars without a known time go last (pending)
+        sorted.sort((a, b) => {
+          if (pt(a) == null && pt(b) == null) return seen(b) - seen(a);
+          if (pt(a) == null) return 1;
+          if (pt(b) == null) return -1;
+          return pt(b) - pt(a);
+        });
         break;
     }
     return sorted;
