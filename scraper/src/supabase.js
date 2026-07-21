@@ -66,6 +66,7 @@ export async function saveCars(cars, existingIds) {
       url: c.url,
       posted_text: c.postedText,
       posted_at: c.postedAt,
+      phone: c.phone ?? null,
       first_seen: now,
       last_seen: now,
       is_new: true,
@@ -100,6 +101,7 @@ export async function updateTimes(cars) {
     const patch = { mileage: c.mileage || 'Not listed' }; // always mark as checked
     if (c.postedAt) { patch.posted_text = c.postedText; patch.posted_at = c.postedAt; }
     if (c.isDealer != null) patch.is_dealer = c.isDealer;
+    if (c.phone) patch.phone = c.phone;
     await supabase.from('listings').update(patch).eq('id', c.id);
   }
 }

@@ -50,6 +50,9 @@ export default function CarCard({ car, onUpdate, onRemove }) {
         {car.mileage && car.mileage !== 'Not listed' && (
           <div className="miles">🚗 {car.mileage}</div>
         )}
+        {car.phone && (
+          <a className="phone" href={`tel:${car.phone.replace(/[^\d+]/g, '')}`}>📞 {car.phone}</a>
+        )}
         {car.posted_text ? (
           <div className="found">🕒 {car.posted_text}</div>
         ) : (

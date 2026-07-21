@@ -56,16 +56,43 @@ export function parseListed(text) {
   return { text: clean, at: null };
 }
 
-/** Read "Listed X ago" AND the mileage ("Driven 84,000 miles") from a detail page. */
-async function fetchDetail(context, url) {
+// Cache seller-id -> active-listing count for this run (a dealer sells many
+// cars, so we'd otherwise re-open the same profile again and again).
+const sellerCountCache = new Map();
+
+/** Open a seller's Marketplace profile and read the "N active listings" number. */
+async function fetchSellerCount(context, href) {
+  const url = href.startsWith('http') ? href : 'https://www.facebook.com' + href;
+  const p = await context.newPage();
+  try {
+    await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+    await p.waitForTimeout(1800 + Math.random() * 600);
+    await p.mouse.wheel(0, 1500);
+    await p.waitForTimeout(800);
+    return await p.evaluate(() => {
+      const m = (document.body.innerText || '').match(/(\d+)\s+active listing/i);
+      return m ? parseInt(m[1], 10) : null;
+    });
+  } catch {
+    return null;
+  } finally {
+    await p.close();
+  }
+}
+
+/**
+ * Read a listing's detail page: "Listed X ago", mileage, phone-in-description,
+ * and whether the SELLER is a dealer (has a dealer badge / financing, OR has
+ * >= dealerMinListings active listings on their profile).
+ */
+async function fetchDetail(context, url, dealerMinListings = 3) {
   const page = await context.newPage();
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForTimeout(800 + Math.random() * 500);
-    // scroll a bit so the "About this vehicle" (mileage) section renders
     await page.mouse.wheel(0, 1200);
     await page.waitForTimeout(600);
-    return await page.evaluate(() => {
+    const d = await page.evaluate(() => {
       let listed = null;
       let mileage = null;
       const miRe = /(driven\s+)?\d[\d.,]*\s*(k\s*)?(miles?|millas?)\b/i;
@@ -78,20 +105,35 @@ async function fetchDetail(context, url) {
         if (listed && mileage) break;
       }
       const bodyText = document.body.innerText || '';
-      // Fallback: scan the whole page text (catches mileage in the description).
       if (!mileage) {
         const m = bodyText.match(/\d[\d.,]{2,}\s*(k\s*)?(miles?|millas?)\b/i)
                || bodyText.match(/\d+\s*k\s*(miles?|millas?)\b/i);
         if (m) mileage = m[0];
       }
-      // Dealer detection: FB dealer listings show a "Dealership" label and
-      // financing options; private sellers don't.
       const low = bodyText.toLowerCase();
-      const dealer = low.includes('dealership') || /financ(e|ing)/.test(low);
-      return { listed, mileage, dealer };
+      const badge = low.includes('dealership') || /financ(e|ing)/.test(low);
+      // Phone number written in the description (FB never exposes it otherwise).
+      const pm = bodyText.match(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/);
+      const phone = pm ? pm[0].trim() : null;
+      const sa = document.querySelector('a[href*="/marketplace/profile/"]');
+      const sellerHref = sa ? sa.getAttribute('href') : null;
+      return { listed, mileage, badge, phone, sellerHref };
     });
+
+    // Seller listing count → dealer if they have many cars.
+    let count = null;
+    if (d.sellerHref) {
+      const sid = (d.sellerHref.match(/profile\/(\d+)/) || [])[1];
+      if (sid && sellerCountCache.has(sid)) count = sellerCountCache.get(sid);
+      else if (sid) {
+        count = await fetchSellerCount(context, d.sellerHref);
+        if (count != null) sellerCountCache.set(sid, count);
+      }
+    }
+    const dealer = d.badge || (count != null && count >= dealerMinListings);
+    return { listed: d.listed, mileage: d.mileage, dealer, phone: d.phone, sellerCount: count };
   } catch {
-    return { listed: null, mileage: null, dealer: null };
+    return { listed: null, mileage: null, dealer: null, phone: null, sellerCount: null };
   } finally {
     await page.close();
   }
@@ -211,12 +253,12 @@ export async function scrapeGrids(config, { headless = true } = {}) {
  * SLOW pass: open each given car's page to read the real "Listed X ago" AND
  * the mileage. Mutates each car and returns the ones that got new detail.
  */
-export async function readTimesFor(cars, { headless = true } = {}) {
+export async function readTimesFor(cars, { headless = true, dealerMinListings = 3 } = {}) {
   if (cars.length === 0) return [];
   return withContext(headless, async (context) => {
     const updated = [];
     for (const c of cars) {
-      const { listed, mileage, dealer } = await fetchDetail(context, c.url);
+      const { listed, mileage, dealer, phone } = await fetchDetail(context, c.url, dealerMinListings);
       const { text, at } = parseListed(listed);
       c.postedText = text;
       c.postedAt = at;
@@ -227,6 +269,7 @@ export async function readTimesFor(cars, { headless = true } = {}) {
         c.mileage = 'Not listed'; // detail checked, seller gave no mileage
       }
       if (dealer != null) c.isDealer = dealer;
+      if (phone) c.phone = phone;
       updated.push(c); // always — records that we checked this car's page
       await new Promise((r) => setTimeout(r, 400 + Math.random() * 400));
     }

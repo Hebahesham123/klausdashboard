@@ -45,8 +45,8 @@ export async function runOnce() {
         .sort((a, b) => (existingIds.has(a.id) ? 1 : 0) - (existingIds.has(b.id) ? 1 : 0))
         .slice(0, cap);
   if (needTime.length > 0) {
-    console.log(`  Reading FB time + mileage for ${needTime.length} car(s)...`);
-    const timed = await readTimesFor(needTime, { headless });
+    console.log(`  Reading FB time + mileage + seller for ${needTime.length} car(s)...`);
+    const timed = await readTimesFor(needTime, { headless, dealerMinListings: config.dealerMinListings ?? 3 });
     await updateTimes(timed);
     // Hide ONLY cars that are over the mileage limit — i.e. they'd pass every
     // filter if we ignored mileage, but fail once the real mileage is known.

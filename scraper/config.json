@@ -53,5 +53,6 @@
   "maxDetailFetchesPerRun": 35,
 
   "_readDetails_note": "false = skip opening each car's page (no mileage, no exact 'Listed X ago'). Much faster, all cars appear instantly, far lower ban risk. Newest-found cars sort to the top.",
-  "readDetails": true
+  "readDetails": true,
+  "dealerMinListings": 3
 }
