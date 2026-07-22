@@ -37,7 +37,7 @@ let hidden = 0;
 const CHUNK = 12;
 for (let i = 0; i < cars.length; i += CHUNK) {
   const chunk = cars.slice(i, i + CHUNK);
-  const updated = await readTimesFor(chunk, { headless: true, concurrency: 6 });
+  const updated = await readTimesFor(chunk, { headless: true, concurrency: 4 });
   await updateTimes(updated); // <-- saved right away, per chunk
   const over = updated.filter((c) => c.mileageValue != null && maxMi != null && c.mileageValue > maxMi);
   if (over.length > 0) { await dismissCars(over.map((c) => c.id)); hidden += over.length; }

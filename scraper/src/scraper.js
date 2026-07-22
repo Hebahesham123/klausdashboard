@@ -131,7 +131,14 @@ async function fetchDetail(context, url, dealerMinListings = 3) {
         if (count != null) sellerCountCache.set(sid, count);
       }
     }
-    const dealer = d.badge || (count != null && count >= dealerMinListings);
+    // dealer: true if badge/financing or seller has >= threshold listings.
+    // If we have a seller link but COULDN'T read the count, return null (unknown)
+    // so it's retried later instead of being wrongly marked private.
+    let dealer;
+    if (d.badge) dealer = true;
+    else if (count != null) dealer = count >= dealerMinListings;
+    else if (d.sellerHref) dealer = null; // seller exists but count unread -> retry
+    else dealer = false; // no seller link at all
     return { listed: d.listed, mileage: d.mileage, dealer, phone: d.phone, sellerCount: count };
   } catch {
     return { listed: null, mileage: null, dealer: null, phone: null, sellerCount: null };
