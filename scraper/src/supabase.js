@@ -116,12 +116,18 @@ export async function updateTimes(cars) {
  * car we've already read. Cheap: a couple of full-table scans + batched updates.
  */
 export async function recomputeDealers(minCars = 3) {
+  // Tolerate the marked_dealer column not existing yet (migration not run).
+  let cols = 'id, seller_id, dealer_badge, marked_dealer';
+  {
+    const probe = await supabase.from('listings').select('marked_dealer').limit(1);
+    if (probe.error) cols = 'id, seller_id, dealer_badge';
+  }
   const rows = [];
   const pageSize = 1000;
   for (let from = 0; ; from += pageSize) {
     const { data, error } = await supabase
       .from('listings')
-      .select('id, seller_id, dealer_badge, marked_dealer')
+      .select(cols)
       .eq('removed', false)
       .range(from, from + pageSize - 1);
     if (error) throw error;
