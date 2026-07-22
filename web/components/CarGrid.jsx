@@ -12,9 +12,17 @@ export default function CarGrid() {
   const [city, setCity] = useState('All');
   const [q, setQ] = useState('');
   const [onlyNew, setOnlyNew] = useState(false);
+  const [justListed, setJustListed] = useState(false);
   const [sort, setSort] = useState('newest');
   const [agentFilter, setAgentFilter] = useState('All agents');
   const [seller, setSeller] = useState('private');
+
+  // "Newly listed on Facebook": listed within the last 24h (by the real FB
+  // time), or a brand-new car whose time we haven't read yet.
+  const isFreshlyListed = (c) => {
+    if (c.posted_at) return Date.now() - new Date(c.posted_at).getTime() < 86400000;
+    return !!c.is_new;
+  };
 
   // Initial load
   useEffect(() => {
@@ -65,6 +73,7 @@ export default function CarGrid() {
       if (c.dismissed || c.removed) return false;
       if (city !== 'All' && c.city !== city) return false;
       if (onlyNew && !c.is_new) return false;
+      if (justListed && !isFreshlyListed(c)) return false;
       if (agentFilter === 'Unassigned' && c.agent) return false;
       if (agentFilter !== 'All agents' && agentFilter !== 'Unassigned' && c.agent !== agentFilter) return false;
       if (seller === 'private' && c.is_dealer === true) return false;
@@ -98,9 +107,10 @@ export default function CarGrid() {
         break;
     }
     return sorted;
-  }, [cars, city, q, onlyNew, sort, agentFilter, seller]);
+  }, [cars, city, q, onlyNew, justListed, sort, agentFilter, seller]);
 
   const newCount = cars.filter((c) => c.is_new && !c.dismissed && !c.removed).length;
+  const freshCount = cars.filter((c) => !c.dismissed && !c.removed && isFreshlyListed(c)).length;
 
   const cityOptions = useMemo(() => {
     const set = new Set(cars.filter((c) => !c.dismissed && !c.removed && c.city).map((c) => c.city));
@@ -139,6 +149,13 @@ export default function CarGrid() {
           onClick={() => setOnlyNew((v) => !v)}
         >
           New only {newCount > 0 ? `(${newCount})` : ''}
+        </button>
+        <button
+          className={`chip ${justListed ? 'active' : ''}`}
+          onClick={() => setJustListed((v) => !v)}
+          title="Only cars listed on Facebook in the last 24 hours"
+        >
+          🔥 Just listed {freshCount > 0 ? `(${freshCount})` : ''}
         </button>
         <select value={sort} onChange={(e) => setSort(e.target.value)} title="Sort">
           <option value="newest">Newest → Oldest</option>
