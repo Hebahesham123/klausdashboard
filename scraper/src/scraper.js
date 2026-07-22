@@ -66,9 +66,7 @@ async function fetchSellerCount(context, href) {
   const p = await context.newPage();
   try {
     await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await p.waitForTimeout(1800 + Math.random() * 600);
-    await p.mouse.wheel(0, 1500);
-    await p.waitForTimeout(800);
+    await p.waitForTimeout(1200 + Math.random() * 400);
     return await p.evaluate(() => {
       const m = (document.body.innerText || '').match(/(\d+)\s+active listing/i);
       return m ? parseInt(m[1], 10) : null;
@@ -253,26 +251,32 @@ export async function scrapeGrids(config, { headless = true } = {}) {
  * SLOW pass: open each given car's page to read the real "Listed X ago" AND
  * the mileage. Mutates each car and returns the ones that got new detail.
  */
-export async function readTimesFor(cars, { headless = true, dealerMinListings = 3 } = {}) {
+export async function readTimesFor(cars, { headless = true, dealerMinListings = 3, concurrency = 1 } = {}) {
   if (cars.length === 0) return [];
   return withContext(headless, async (context) => {
     const updated = [];
-    for (const c of cars) {
-      const { listed, mileage, dealer, phone } = await fetchDetail(context, c.url, dealerMinListings);
-      const { text, at } = parseListed(listed);
-      c.postedText = text;
-      c.postedAt = at;
-      if (mileage) {
-        c.mileage = mileage;
-        c.mileageValue = parseMileage(mileage);
-      } else if (!c.mileage) {
-        c.mileage = 'Not listed'; // detail checked, seller gave no mileage
+    let idx = 0;
+    const worker = async () => {
+      while (idx < cars.length) {
+        const c = cars[idx++];
+        const { listed, mileage, dealer, phone } = await fetchDetail(context, c.url, dealerMinListings);
+        const { text, at } = parseListed(listed);
+        c.postedText = text;
+        c.postedAt = at;
+        if (mileage) {
+          c.mileage = mileage;
+          c.mileageValue = parseMileage(mileage);
+        } else if (!c.mileage) {
+          c.mileage = 'Not listed';
+        }
+        if (dealer != null) c.isDealer = dealer;
+        if (phone) c.phone = phone;
+        updated.push(c);
+        await new Promise((r) => setTimeout(r, 150 + Math.random() * 200));
       }
-      if (dealer != null) c.isDealer = dealer;
-      if (phone) c.phone = phone;
-      updated.push(c); // always — records that we checked this car's page
-      await new Promise((r) => setTimeout(r, 400 + Math.random() * 400));
-    }
+    };
+    // Run `concurrency` page-readers in parallel.
+    await Promise.all(Array.from({ length: Math.max(1, concurrency) }, worker));
     return updated;
   });
 }

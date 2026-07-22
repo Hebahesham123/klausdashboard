@@ -34,10 +34,10 @@ const cars = data.map((r) => ({ id: r.id, url: r.url, title: r.title, mileage: n
 let done = 0;
 let real = 0;
 let hidden = 0;
-const CHUNK = 5;
+const CHUNK = 12;
 for (let i = 0; i < cars.length; i += CHUNK) {
   const chunk = cars.slice(i, i + CHUNK);
-  const updated = await readTimesFor(chunk, { headless: true });
+  const updated = await readTimesFor(chunk, { headless: true, concurrency: 6 });
   await updateTimes(updated); // <-- saved right away, per chunk
   const over = updated.filter((c) => c.mileageValue != null && maxMi != null && c.mileageValue > maxMi);
   if (over.length > 0) { await dismissCars(over.map((c) => c.id)); hidden += over.length; }
