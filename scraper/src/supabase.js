@@ -20,18 +20,18 @@ export const supabase = createClient(url, key, {
  */
 export async function getExistingIds() {
   const all = new Set();
-  const checked = new Set(); // cars whose detail page we've fully read (mileage + dealer)
+  const checked = new Set(); // cars whose detail page we've read (dealer_badge set)
   const pageSize = 1000;
   for (let from = 0; ; from += pageSize) {
     const { data, error } = await supabase
       .from('listings')
-      .select('id, mileage, is_dealer')
+      .select('id, dealer_badge')
       .range(from, from + pageSize - 1);
     if (error) throw error;
     if (!data || data.length === 0) break;
     for (const row of data) {
       all.add(row.id);
-      if (row.mileage && row.is_dealer != null) checked.add(row.id);
+      if (row.dealer_badge != null) checked.add(row.id);
     }
     if (data.length < pageSize) break;
   }
@@ -67,6 +67,8 @@ export async function saveCars(cars, existingIds) {
       posted_text: c.postedText,
       posted_at: c.postedAt,
       phone: c.phone ?? null,
+      seller_id: c.sellerId ?? null,
+      dealer_badge: c.dealerBadge ?? null,
       first_seen: now,
       last_seen: now,
       is_new: true,
@@ -95,13 +97,58 @@ export async function dismissCars(ids) {
   await supabase.from('listings').update({ dismissed: true }).in('id', ids);
 }
 
-/** Write the real listing time and mileage onto cars we just read from detail pages. */
+/** Write the real listing time, mileage, seller id, dealer badge, and phone. */
 export async function updateTimes(cars) {
   for (const c of cars) {
     const patch = { mileage: c.mileage || 'Not listed' }; // always mark as checked
     if (c.postedAt) { patch.posted_text = c.postedText; patch.posted_at = c.postedAt; }
-    if (c.isDealer != null) patch.is_dealer = c.isDealer;
+    if (c.dealerBadge != null) patch.dealer_badge = c.dealerBadge;
+    if (c.sellerId) patch.seller_id = c.sellerId;
     if (c.phone) patch.phone = c.phone;
     await supabase.from('listings').update(patch).eq('id', c.id);
   }
+}
+
+/**
+ * Decide who's a car dealer: a seller with >= minCars CARS in our data (our
+ * whole DB is cars, so this never miscounts furniture/phones), OR any listing
+ * that itself shows a dealership/financing badge. Updates is_dealer on every
+ * car we've already read. Cheap: a couple of full-table scans + batched updates.
+ */
+export async function recomputeDealers(minCars = 3) {
+  const rows = [];
+  const pageSize = 1000;
+  for (let from = 0; ; from += pageSize) {
+    const { data, error } = await supabase
+      .from('listings')
+      .select('id, seller_id, dealer_badge')
+      .eq('removed', false)
+      .range(from, from + pageSize - 1);
+    if (error) throw error;
+    if (!data || data.length === 0) break;
+    rows.push(...data);
+    if (data.length < pageSize) break;
+  }
+
+  // Count cars per seller (only reads with a seller id count).
+  const counts = new Map();
+  for (const r of rows) {
+    if (r.seller_id) counts.set(r.seller_id, (counts.get(r.seller_id) || 0) + 1);
+  }
+
+  // Compute is_dealer only for cars we've actually read (dealer_badge set).
+  const wantDealer = [];
+  const wantPrivate = [];
+  for (const r of rows) {
+    if (r.dealer_badge == null) continue; // not read yet — leave as-is
+    const isDealer = r.dealer_badge === true || (r.seller_id && counts.get(r.seller_id) >= minCars);
+    (isDealer ? wantDealer : wantPrivate).push(r.id);
+  }
+
+  for (let i = 0; i < wantDealer.length; i += 500)
+    await supabase.from('listings').update({ is_dealer: true }).in('id', wantDealer.slice(i, i + 500));
+  for (let i = 0; i < wantPrivate.length; i += 500)
+    await supabase.from('listings').update({ is_dealer: false }).in('id', wantPrivate.slice(i, i + 500));
+
+  return { dealers: wantDealer.length, privates: wantPrivate.length };
 }

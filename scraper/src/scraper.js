@@ -56,44 +56,21 @@ export function parseListed(text) {
   return { text: clean, at: null };
 }
 
-// Cache seller-id -> active-listing count for this run (a dealer sells many
-// cars, so we'd otherwise re-open the same profile again and again).
-const sellerCountCache = new Map();
-
-/** Open a seller's Marketplace profile and read the "N active listings" number. */
-async function fetchSellerCount(context, href) {
-  const url = href.startsWith('http') ? href : 'https://www.facebook.com' + href;
-  const p = await context.newPage();
-  try {
-    await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await p.waitForTimeout(1600 + Math.random() * 500);
-    await p.mouse.wheel(0, 800);
-    await p.waitForTimeout(500);
-    return await p.evaluate(() => {
-      // Handles "6 active listings" AND "20+ active listings" (dealers show a "+").
-      const m = (document.body.innerText || '').match(/(\d+)\s*\+?\s*active listing/i);
-      return m ? parseInt(m[1], 10) : null;
-    });
-  } catch {
-    return null;
-  } finally {
-    await p.close();
-  }
-}
-
 /**
  * Read a listing's detail page: "Listed X ago", mileage, phone-in-description,
- * and whether the SELLER is a dealer (has a dealer badge / financing, OR has
- * >= dealerMinListings active listings on their profile).
+ * the seller's id, and whether the listing itself carries a dealer badge /
+ * financing. Whether the SELLER is a car dealer is decided later, by counting
+ * how many CARS that same seller has in our database (see recomputeDealers).
+ * One page load per car — no seller-profile visit.
  */
-async function fetchDetail(context, url, dealerMinListings = 3) {
+async function fetchDetail(context, url) {
   const page = await context.newPage();
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await page.waitForTimeout(800 + Math.random() * 500);
+    await page.waitForTimeout(700 + Math.random() * 400);
     await page.mouse.wheel(0, 1200);
-    await page.waitForTimeout(600);
-    const d = await page.evaluate(() => {
+    await page.waitForTimeout(500);
+    return await page.evaluate(() => {
       let listed = null;
       let mileage = null;
       const miRe = /(driven\s+)?\d[\d.,]*\s*(k\s*)?(miles?|millas?)\b/i;
@@ -117,31 +94,11 @@ async function fetchDetail(context, url, dealerMinListings = 3) {
       const pm = bodyText.match(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/);
       const phone = pm ? pm[0].trim() : null;
       const sa = document.querySelector('a[href*="/marketplace/profile/"]');
-      const sellerHref = sa ? sa.getAttribute('href') : null;
-      return { listed, mileage, badge, phone, sellerHref };
+      const sellerId = sa ? ((sa.getAttribute('href') || '').match(/profile\/(\d+)/) || [])[1] || null : null;
+      return { listed, mileage, badge, phone, sellerId };
     });
-
-    // Seller listing count → dealer if they have many cars.
-    let count = null;
-    if (d.sellerHref) {
-      const sid = (d.sellerHref.match(/profile\/(\d+)/) || [])[1];
-      if (sid && sellerCountCache.has(sid)) count = sellerCountCache.get(sid);
-      else if (sid) {
-        count = await fetchSellerCount(context, d.sellerHref);
-        if (count != null) sellerCountCache.set(sid, count);
-      }
-    }
-    // dealer: true if badge/financing or seller has >= threshold listings.
-    // If we have a seller link but COULDN'T read the count, return null (unknown)
-    // so it's retried later instead of being wrongly marked private.
-    let dealer;
-    if (d.badge) dealer = true;
-    else if (count != null) dealer = count >= dealerMinListings;
-    else if (d.sellerHref) dealer = null; // seller exists but count unread -> retry
-    else dealer = false; // no seller link at all
-    return { listed: d.listed, mileage: d.mileage, dealer, phone: d.phone, sellerCount: count };
   } catch {
-    return { listed: null, mileage: null, dealer: null, phone: null, sellerCount: null };
+    return { listed: null, mileage: null, badge: null, phone: null, sellerId: null };
   } finally {
     await page.close();
   }
@@ -261,7 +218,7 @@ export async function scrapeGrids(config, { headless = true } = {}) {
  * SLOW pass: open each given car's page to read the real "Listed X ago" AND
  * the mileage. Mutates each car and returns the ones that got new detail.
  */
-export async function readTimesFor(cars, { headless = true, dealerMinListings = 3, concurrency = 1 } = {}) {
+export async function readTimesFor(cars, { headless = true, concurrency = 1 } = {}) {
   if (cars.length === 0) return [];
   return withContext(headless, async (context) => {
     const updated = [];
@@ -269,7 +226,7 @@ export async function readTimesFor(cars, { headless = true, dealerMinListings = 
     const worker = async () => {
       while (idx < cars.length) {
         const c = cars[idx++];
-        const { listed, mileage, dealer, phone } = await fetchDetail(context, c.url, dealerMinListings);
+        const { listed, mileage, badge, phone, sellerId } = await fetchDetail(context, c.url);
         const { text, at } = parseListed(listed);
         c.postedText = text;
         c.postedAt = at;
@@ -279,10 +236,11 @@ export async function readTimesFor(cars, { headless = true, dealerMinListings = 
         } else if (!c.mileage) {
           c.mileage = 'Not listed';
         }
-        if (dealer != null) c.isDealer = dealer;
+        if (badge != null) c.dealerBadge = badge;
+        if (sellerId) c.sellerId = sellerId;
         if (phone) c.phone = phone;
         updated.push(c);
-        await new Promise((r) => setTimeout(r, 150 + Math.random() * 200));
+        await new Promise((r) => setTimeout(r, 120 + Math.random() * 150));
       }
     };
     // Run `concurrency` page-readers in parallel.

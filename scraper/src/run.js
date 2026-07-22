@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { scrapeGrids, readTimesFor } from './scraper.js';
 import { keepCar } from './filters.js';
-import { getExistingIds, saveCars, updateTimes, dismissCars } from './supabase.js';
+import { getExistingIds, saveCars, updateTimes, dismissCars, recomputeDealers } from './supabase.js';
 import { sendNewCarsEmail } from './email.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,7 +46,7 @@ export async function runOnce() {
         .slice(0, cap);
   if (needTime.length > 0) {
     console.log(`  Reading FB time + mileage + seller for ${needTime.length} car(s)...`);
-    const timed = await readTimesFor(needTime, { headless, dealerMinListings: config.dealerMinListings ?? 3, concurrency: config.readConcurrency ?? 3 });
+    const timed = await readTimesFor(needTime, { headless, concurrency: config.readConcurrency ?? 5 });
     await updateTimes(timed);
     // Hide ONLY cars that are over the mileage limit — i.e. they'd pass every
     // filter if we ignored mileage, but fail once the real mileage is known.
@@ -62,6 +62,10 @@ export async function runOnce() {
       console.log(`  Hid ${over.length} car(s) over the mileage limit.`);
     }
   }
+
+  // Re-decide dealers from car-counts-per-seller (only counts cars in our DB).
+  const dc = await recomputeDealers(config.dealerMinListings ?? 3);
+  console.log(`  Dealers: ${dc.dealers} | private: ${dc.privates}`);
 
   if (newCars.length > 0) await sendNewCarsEmail(newCars);
   else console.log('  No new cars this run.');
