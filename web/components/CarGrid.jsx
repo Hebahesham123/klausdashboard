@@ -68,6 +68,22 @@ export default function CarGrid() {
     await supabase.from('listings').update({ removed: true }).eq('id', id);
   }
 
+  // Tag a seller as a dealer by hand — hides ALL their cars (this one + every
+  // other one, now and in the future) from the Private view. Sticky.
+  async function markDealer(car) {
+    if (car.seller_id) {
+      setCars((prev) =>
+        prev.map((c) => (c.seller_id === car.seller_id ? { ...c, is_dealer: true, marked_dealer: true } : c))
+      );
+      await supabase.from('listings')
+        .update({ is_dealer: true, marked_dealer: true })
+        .eq('seller_id', car.seller_id);
+    } else {
+      setCars((prev) => prev.map((c) => (c.id === car.id ? { ...c, is_dealer: true, marked_dealer: true } : c)));
+      await supabase.from('listings').update({ is_dealer: true, marked_dealer: true }).eq('id', car.id);
+    }
+  }
+
   const filtered = useMemo(() => {
     const list = cars.filter((c) => {
       if (c.dismissed || c.removed) return false;
@@ -176,7 +192,7 @@ export default function CarGrid() {
       ) : (
         <div className="grid">
           {filtered.map((car) => (
-            <CarCard key={car.id} car={car} onUpdate={updateCar} onRemove={removeCar} />
+            <CarCard key={car.id} car={car} onUpdate={updateCar} onRemove={removeCar} onMarkDealer={markDealer} />
           ))}
         </div>
       )}

@@ -1,29 +1,29 @@
 {
-  "_comment": "IMPORTANT: uses Facebook's SEARCH url (/search?query=...), which is the ONLY view that actually honors sortBy=creation_time_descend (newest first) and daysSinceListed. The category-browse url ignores those and returns a 'Suggested' mix. query=car/truck/suv covers all body styles. daysSinceListed=30 = last 24h so brand-new cars surface at the top every cycle. radius is set on the account's Marketplace location; the value here nudges it wider. Real city comes from each listing.",
+  "_comment": "Facebook throttles automated access: each SEARCH returns only ~21 results (and won't scroll further). BUT each different query term returns ~21 DISTINCT cars, so we run many queries (body styles + popular makes) to multiply coverage. All use the SEARCH url with sortBy=creation_time_descend (newest first). scrolls kept low (8) since results plateau by ~7. Real city comes from each listing. If searches still feel thin, run `npm run login` to refresh the session — a fresh session often lifts the throttle.",
   "searches": [
-    {
-      "city": null,
-      "scrolls": 12,
-      "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
-    },
-    {
-      "city": null,
-      "scrolls": 12,
-      "url": "https://www.facebook.com/marketplace/bellflower/search?query=truck&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
-    },
-    {
-      "city": null,
-      "scrolls": 12,
-      "url": "https://www.facebook.com/marketplace/bellflower/search?query=suv&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
-    },
-    {
-      "city": null,
-      "scrolls": 12,
-      "url": "https://www.facebook.com/marketplace/bellflower/cars?exact=false&radius=65"
-    }
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=truck&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=suv&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=sedan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=van&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=toyota&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=honda&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=ford&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=chevrolet&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=nissan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=hyundai&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=kia&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=jeep&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=mazda&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=subaru&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=bmw&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=mercedes&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=lexus&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=dodge&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
+    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=gmc&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" }
   ],
 
-  "_filters_comment": "A car is kept if it matches ANY entry in 'wanted' (OR logic). Leave 'wanted' empty [] to keep every car. Each wanted entry: all of its set fields must match (AND logic). Fields are optional — omit what you don't care about. Current setup: ANY brand, price >= $6000, mileage <= 120k, year 2016-2025.",
+  "_filters_comment": "A car is kept if it matches ANY entry in 'wanted' (OR logic). Leave 'wanted' empty [] to keep every car. Current setup: ANY brand, price >= $6000, mileage <= 110k, year 2016-2025.",
   "filters": {
     "wanted": [
       {
@@ -33,7 +33,7 @@
         "maxMileage": 110000
       }
     ],
-    "_includeCities_note": "Only keep cars whose listing city is in this list. Empty [] = keep every city (whole radius area). Currently empty per user request (whole 65-mile area).",
+    "_includeCities_note": "Only keep cars whose listing city is in this list. Empty [] = keep every city (whole radius area).",
     "includeCities": [],
     "excludeKeywords": ["wanted", "looking for", "trade only", "parts only", "salvage", "rebuilt", "for parts", "not running",
       "locksmith", "key fob", "car keys", "key replacement", "cash for cars", "cars for sale", "we buy cars", "auto lock",
@@ -48,11 +48,12 @@
 
   "maxCarsPerCity": 0,
 
-  "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL cars (any age). maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact 'Listed X ago' time (higher = more get a real time, but slower + higher ban risk).",
+  "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL. maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact time/mileage/seller.",
   "maxListingAgeDays": null,
-  "maxDetailFetchesPerRun": 35,
+  "maxDetailFetchesPerRun": 45,
 
-  "_readDetails_note": "false = skip opening each car's page (no mileage, no exact 'Listed X ago'). Much faster, all cars appear instantly, far lower ban risk. Newest-found cars sort to the top.",
+  "_readDetails_note": "false = skip opening each car's page. Newest-found cars sort to the top.",
   "readDetails": true,
-  "dealerMinListings": 3
+  "dealerMinListings": 3,
+  "readConcurrency": 5
 }

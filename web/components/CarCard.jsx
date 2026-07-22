@@ -18,7 +18,7 @@ function timeAgo(iso) {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 }
 
-export default function CarCard({ car, onUpdate, onRemove }) {
+export default function CarCard({ car, onUpdate, onRemove, onMarkDealer }) {
   const price = car.price_text || (car.price_value != null ? `$${car.price_value.toLocaleString()}` : '—');
   const found = timeAgo(car.first_seen);
   const [notes, setNotes] = useState(car.notes || '');
@@ -30,6 +30,15 @@ export default function CarCard({ car, onUpdate, onRemove }) {
       {car.is_new && <span className="badge-new">NEW</span>}
       {car.is_dealer === true && <span className="badge-dealer">DEALER</span>}
       <button className="remove" title="Remove this car" onClick={() => onRemove(car.id)}>✕</button>
+      {onMarkDealer && car.is_dealer !== true && (
+        <button
+          className="mark-dealer"
+          title="This is a dealer — hide all their cars (now & future)"
+          onClick={() => onMarkDealer(car)}
+        >
+          🏢 Dealer
+        </button>
+      )}
 
       <a className="imgwrap" href={car.url} target="_blank" rel="noopener noreferrer">
         {car.image_url ? (

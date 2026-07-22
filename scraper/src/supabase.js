@@ -121,7 +121,7 @@ export async function recomputeDealers(minCars = 3) {
   for (let from = 0; ; from += pageSize) {
     const { data, error } = await supabase
       .from('listings')
-      .select('id, seller_id, dealer_badge')
+      .select('id, seller_id, dealer_badge, marked_dealer')
       .eq('removed', false)
       .range(from, from + pageSize - 1);
     if (error) throw error;
@@ -130,18 +130,24 @@ export async function recomputeDealers(minCars = 3) {
     if (data.length < pageSize) break;
   }
 
-  // Count cars per seller (only reads with a seller id count).
+  // Count cars per seller, and collect sellers you've tagged as dealers by hand.
   const counts = new Map();
+  const markedSellers = new Set();
   for (const r of rows) {
     if (r.seller_id) counts.set(r.seller_id, (counts.get(r.seller_id) || 0) + 1);
+    if (r.marked_dealer && r.seller_id) markedSellers.add(r.seller_id);
   }
 
-  // Compute is_dealer only for cars we've actually read (dealer_badge set).
+  // Compute is_dealer only for cars we've actually read (dealer_badge set) OR
+  // that you've tagged by hand.
   const wantDealer = [];
   const wantPrivate = [];
   for (const r of rows) {
-    if (r.dealer_badge == null) continue; // not read yet — leave as-is
-    const isDealer = r.dealer_badge === true || (r.seller_id && counts.get(r.seller_id) >= minCars);
+    if (r.dealer_badge == null && !r.marked_dealer) continue; // not read yet — leave as-is
+    const isDealer =
+      r.dealer_badge === true ||
+      r.marked_dealer === true ||
+      (r.seller_id && (counts.get(r.seller_id) >= minCars || markedSellers.has(r.seller_id)));
     (isDealer ? wantDealer : wantPrivate).push(r.id);
   }
 
