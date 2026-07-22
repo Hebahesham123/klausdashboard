@@ -203,23 +203,29 @@ async function withContext(headless, fn) {
  * FAST pass: scrape every city's grid and return the deduped cars (no listing
  * time yet). This is quick, so cars can be saved and shown immediately.
  */
-export async function scrapeGrids(config, { headless = true } = {}) {
+export async function scrapeGrids(config, { headless = true, onBatch = null } = {}) {
   return withContext(headless, async (context) => {
     const all = [];
+    const seen = new Set(); // dedupe across searches
     for (const search of config.searches) {
       try {
         const cars = await scrapeCity(context, search);
         const limited = config.maxCarsPerCity > 0 ? cars.slice(0, config.maxCarsPerCity) : cars;
-        all.push(...limited);
-        console.log(`  ${search.city}: found ${limited.length} listings`);
+        const fresh = limited.filter((c) => !seen.has(c.id));
+        for (const c of fresh) seen.add(c.id);
+        all.push(...fresh);
+        console.log(`  ${search.city ?? 'search'}: found ${limited.length} listings (${fresh.length} new to this run)`);
+        // Save this search's cars right away so they show on the dashboard NOW,
+        // instead of waiting for the remaining searches to finish.
+        if (onBatch && fresh.length) {
+          try { await onBatch(fresh); } catch (e) { console.error('  save batch error:', e.message); }
+        }
       } catch (err) {
-        console.error(`  ${search.city}: ${err.message}`);
+        console.error(`  ${search.city ?? 'search'}: ${err.message}`);
       }
       await new Promise((r) => setTimeout(r, 1000 + Math.random() * 1200));
     }
-    const byId = new Map();
-    for (const c of all) if (!byId.has(c.id)) byId.set(c.id, c);
-    return Array.from(byId.values());
+    return all;
   });
 }
 

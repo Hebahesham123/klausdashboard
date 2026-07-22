@@ -29,18 +29,30 @@ export async function runOnce() {
 
   const { all: existingIds, checked: checkedIds } = await getExistingIds();
 
-  const grid = await scrapeGrids(config, { headless });
-  const kept = grid.filter((c) => keepCar(c, config.filters));
+  // 1) SAVE PER SEARCH — as each search finishes, its cars are saved and appear
+  //    on the dashboard immediately (don't wait for the other searches).
+  const kept = [];
+  const newCars = [];
+  const newIds = new Set(); // brand-new this cycle (for read prioritization)
+  const grid = await scrapeGrids(config, {
+    headless,
+    onBatch: async (batch) => {
+      const good = batch.filter((c) => keepCar(c, config.filters));
+      if (good.length === 0) return;
+      kept.push(...good);
+      const created = await saveCars(good, existingIds);
+      for (const c of good) existingIds.add(c.id); // don't re-insert in later searches
+      for (const c of created) newIds.add(c.id);
+      newCars.push(...created);
+      if (created.length > 0) console.log(`  🚗 ${created.length} new car(s) shown now`);
+    },
+  });
   console.log(`  ${grid.length} scraped, ${kept.length} match your filters.`);
 
-  // 1) SAVE NOW — cars appear immediately (real time fills in next).
-  const newCars = await saveCars(kept, existingIds);
-  if (newCars.length > 0) console.log(`  🚗 ${newCars.length} new car(s) added — reading their FB times...`);
-
-  // 2) Read pages for unchecked cars, brand-new ones first.
+  // 2) Read pages for unchecked cars, freshest first.
   // Read order: Facebook "Just listed" first, then brand-new, then the rest —
   // so the freshest cars get their real time + dealer check the soonest.
-  const prio = (c) => (c.justListed ? 0 : 2) + (existingIds.has(c.id) ? 1 : 0);
+  const prio = (c) => (c.justListed ? 0 : 2) + (newIds.has(c.id) ? 0 : 1);
   const needTime = config.readDetails === false
     ? []
     : kept
