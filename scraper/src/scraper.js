@@ -66,9 +66,12 @@ async function fetchSellerCount(context, href) {
   const p = await context.newPage();
   try {
     await p.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
-    await p.waitForTimeout(1200 + Math.random() * 400);
+    await p.waitForTimeout(1600 + Math.random() * 500);
+    await p.mouse.wheel(0, 800);
+    await p.waitForTimeout(500);
     return await p.evaluate(() => {
-      const m = (document.body.innerText || '').match(/(\d+)\s+active listing/i);
+      // Handles "6 active listings" AND "20+ active listings" (dealers show a "+").
+      const m = (document.body.innerText || '').match(/(\d+)\s*\+?\s*active listing/i);
       return m ? parseInt(m[1], 10) : null;
     });
   } catch {
