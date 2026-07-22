@@ -1,28 +1,782 @@
 {
   "_comment": "Facebook throttles automated access: each SEARCH returns only ~21 results (and won't scroll further). BUT each different query term returns ~21 DISTINCT cars, so we run many queries (body styles + popular makes) to multiply coverage. All use the SEARCH url with sortBy=creation_time_descend (newest first). scrolls kept low (8) since results plateau by ~7. Real city comes from each listing. If searches still feel thin, run `npm run login` to refresh the session — a fresh session often lifts the throttle.",
   "searches": [
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=truck&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=suv&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=sedan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=van&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=toyota&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=honda&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=ford&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=chevrolet&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=nissan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=hyundai&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=kia&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=jeep&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=mazda&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=subaru&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=bmw&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=mercedes&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=lexus&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=dodge&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" },
-    { "city": null, "scrolls": 8, "url": "https://www.facebook.com/marketplace/bellflower/search?query=gmc&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30" }
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=car&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=truck&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=suv&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sedan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=van&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=coupe&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=hatchback&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=minivan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=pickup&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=crossover&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=wagon&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=toyota&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=honda&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=ford&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=chevrolet&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=nissan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=hyundai&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=kia&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=jeep&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mazda&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=subaru&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=bmw&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mercedes&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=lexus&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=dodge&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=gmc&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=ram&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=acura&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=infiniti&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=audi&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=volkswagen&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=volvo&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=cadillac&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tesla&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=chrysler&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mitsubishi&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=buick&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=lincoln&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=genesis&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mini&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=land%20rover&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=porsche&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=jaguar&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=camry&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=corolla&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=rav4&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tacoma&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=4runner&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=highlander&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tundra&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sienna&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=prius&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=camry%20hybrid&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=civic&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=accord&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=cr-v&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=pilot&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=odyssey&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=hr-v&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=passport&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=ridgeline&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=f-150&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mustang&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=explorer&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=escape&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=edge&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=expedition&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=fusion&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=ranger&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=silverado&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=equinox&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=malibu&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tahoe&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=suburban&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=camaro&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=colorado&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=traverse&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=trax&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=altima&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sentra&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=rogue&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=murano&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=maxima&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=frontier&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=pathfinder&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=versa&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=kicks&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=elantra&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sonata&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tucson&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=santa%20fe&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=palisade&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=kona&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=venue&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=accent&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=forte&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sorento&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sportage&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=telluride&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=seltos&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=soul&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=optima&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=k5&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=wrangler&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=grand%20cherokee&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=cherokee&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=compass&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=gladiator&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=renegade&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=cx-5&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=cx-9&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=cx-30&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mazda3&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mazda6&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=outback&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=forester&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=crosstrek&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=impreza&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=ascent&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=x5&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=x3&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=x7&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=3%20series&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=5%20series&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=c-class&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=e-class&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=gle&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=glc&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=glk&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=es%20350&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=rx%20350&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=nx&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=is%20250&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=gx&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=charger&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=challenger&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=durango&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=grand%20caravan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=sierra&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=yukon&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=canyon&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tlx&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=mdx&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=rdx&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=q50&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=qx60&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=q5&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=q7&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=a4&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=a6&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=atlas&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=tiguan&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=jetta&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=passat&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    },
+    {
+      "city": null,
+      "scrolls": 8,
+      "url": "https://www.facebook.com/marketplace/bellflower/search?query=golf&sortBy=creation_time_descend&exact=false&radius=65&daysSinceListed=30"
+    }
   ],
-
   "_filters_comment": "A car is kept if it matches ANY entry in 'wanted' (OR logic). Leave 'wanted' empty [] to keep every car. Current setup: ANY brand, price >= $6000, mileage <= 110k, year 2016-2025.",
   "filters": {
     "wanted": [
@@ -35,23 +789,109 @@
     ],
     "_includeCities_note": "Only keep cars whose listing city is in this list. Empty [] = keep every city (whole radius area).",
     "includeCities": [],
-    "excludeKeywords": ["wanted", "looking for", "trade only", "parts only", "salvage", "rebuilt", "for parts", "not running",
-      "locksmith", "key fob", "car keys", "key replacement", "cash for cars", "cars for sale", "we buy cars", "auto lock",
-      "motorcycle", "motorbike", "scooter", "moped", "ducati", "harley", "harley-davidson", "panigale", "ninja",
-      "cbr", "gsx-r", "gsxr", "yzf", "ktm", "aprilia", "vespa", "sportbike", "sport bike", "moto guzzi",
-      "atv", "utv", "dirt bike", "dirtbike", "quad", "can-am", "can am", "sea-doo", "jet ski", "jetski", "rzr", "trailer only",
-      "motor coach", "motorhome", "winnebago", "thor motor", "coachmen", "jayco", "forest river", "fleetwood", "fifth wheel", "5th wheel", "toy hauler",
-      "beneteau", "sea ray", "bayliner", "pontoon", "boat", "yacht", "sailboat", "jet boat",
-      "sprinter", "metris", "ford transit", "e-transit", "transit connect", "cargo van", "passenger van", "promaster", "traila", "funco",
-      "kenworth", "peterbilt", "freightliner", "cascadia", "t680", "t880", "semi truck", "day cab", "sleeper", "box truck", "cab & chassis", "cab and chassis", "dump truck", "flatbed", "mack truck", "international lonestar", "utility truck", "bucket truck", "tow truck", "reefer"]
+    "excludeKeywords": [
+      "wanted",
+      "looking for",
+      "trade only",
+      "parts only",
+      "salvage",
+      "rebuilt",
+      "for parts",
+      "not running",
+      "locksmith",
+      "key fob",
+      "car keys",
+      "key replacement",
+      "cash for cars",
+      "cars for sale",
+      "we buy cars",
+      "auto lock",
+      "motorcycle",
+      "motorbike",
+      "scooter",
+      "moped",
+      "ducati",
+      "harley",
+      "harley-davidson",
+      "panigale",
+      "ninja",
+      "cbr",
+      "gsx-r",
+      "gsxr",
+      "yzf",
+      "ktm",
+      "aprilia",
+      "vespa",
+      "sportbike",
+      "sport bike",
+      "moto guzzi",
+      "atv",
+      "utv",
+      "dirt bike",
+      "dirtbike",
+      "quad",
+      "can-am",
+      "can am",
+      "sea-doo",
+      "jet ski",
+      "jetski",
+      "rzr",
+      "trailer only",
+      "motor coach",
+      "motorhome",
+      "winnebago",
+      "thor motor",
+      "coachmen",
+      "jayco",
+      "forest river",
+      "fleetwood",
+      "fifth wheel",
+      "5th wheel",
+      "toy hauler",
+      "beneteau",
+      "sea ray",
+      "bayliner",
+      "pontoon",
+      "boat",
+      "yacht",
+      "sailboat",
+      "jet boat",
+      "sprinter",
+      "metris",
+      "ford transit",
+      "e-transit",
+      "transit connect",
+      "cargo van",
+      "passenger van",
+      "promaster",
+      "traila",
+      "funco",
+      "kenworth",
+      "peterbilt",
+      "freightliner",
+      "cascadia",
+      "t680",
+      "t880",
+      "semi truck",
+      "day cab",
+      "sleeper",
+      "box truck",
+      "cab & chassis",
+      "cab and chassis",
+      "dump truck",
+      "flatbed",
+      "mack truck",
+      "international lonestar",
+      "utility truck",
+      "bucket truck",
+      "tow truck",
+      "reefer"
+    ]
   },
-
   "maxCarsPerCity": 0,
-
   "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL. maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact time/mileage/seller.",
   "maxListingAgeDays": null,
-  "maxDetailFetchesPerRun": 45,
-
+  "maxDetailFetchesPerRun": 60,
   "_readDetails_note": "false = skip opening each car's page. Newest-found cars sort to the top.",
   "readDetails": true,
   "dealerMinListings": 3,
