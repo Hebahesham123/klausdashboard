@@ -39,6 +39,40 @@ function textIncludesAny(haystack, needles) {
   return (needles || []).some((n) => h.includes(String(n).toLowerCase()));
 }
 
+// Browsing the "vehicles" category also returns motorcycles, boats, RVs and
+// trailers. A real CAR title almost always names a car make, model, or body
+// style — none of which appear on a boat/bike/RV. Require one.
+const CAR_RE = new RegExp('\\b(' + [
+  // makes
+  'toyota','honda','ford','chevrolet','chevy','nissan','hyundai','kia','jeep','mazda','subaru','bmw',
+  'mercedes','benz','lexus','dodge','gmc','ram','acura','infiniti','audi','volkswagen','vw','volvo',
+  'cadillac','buick','chrysler','mitsubishi','tesla','lincoln','genesis','porsche','jaguar','fiat',
+  'maserati','bentley','ferrari','lamborghini','scion','pontiac','saturn','hummer','saab','isuzu',
+  'lucid','rivian','polestar','datsun','mercury','land rover','range rover','alfa romeo','mini cooper',
+  'mini','lotus','rolls','mclaren','aston martin','bugatti','maybach','koenigsegg',
+  // body styles
+  'sedan','suv','coupe','hatchback','pickup','minivan','wagon','convertible','crossover',
+  // common models (help titles that omit the make)
+  'camry','corolla','rav4','tacoma','tundra','4runner','highlander','sienna','prius','avalon','supra','venza',
+  'civic','accord','cr-v','pilot','odyssey','hr-v','passport','ridgeline','insight',
+  'f-150','f150','f-250','f250','mustang','explorer','escape','expedition','fusion','ranger','bronco','maverick',
+  'silverado','equinox','malibu','tahoe','suburban','camaro','colorado','traverse','corvette','impala','cruze','blazer',
+  'altima','sentra','rogue','murano','maxima','frontier','pathfinder','versa','kicks','armada','titan','leaf',
+  'elantra','sonata','tucson','santa fe','palisade','kona','accent','veloster','ioniq','santa cruz',
+  'forte','sorento','sportage','telluride','seltos','optima','stinger','carnival',
+  'wrangler','grand cherokee','cherokee','compass','gladiator','renegade',
+  'mazda3','mazda6','miata','cx-5','cx-9','cx-30','cx-50','cx-3',
+  'outback','forester','crosstrek','impreza','ascent','legacy','wrx',
+  '3 series','5 series','4 series','330i','328i','glc','gle','gla','gls','c-class','e-class','s-class','sprinter',
+  'charger','challenger','durango','grand caravan','sierra','yukon','acadia','terrain',
+  'tlx','mdx','rdx','qx60','qx80','q5','q7','q3','a4','a6','a5','e-tron',
+  'atlas','tiguan','jetta','passat','golf','gti','taos'
+].join('|') + ')\\b', 'i');
+
+export function looksLikeCar(car) {
+  return CAR_RE.test((car.title || '') + ' ' + (car.mileage || ''));
+}
+
 function matchesWanted(car, w) {
   const title = (car.title || '').toLowerCase();
 
@@ -72,6 +106,9 @@ export function keepCar(car, filters) {
   if (!filters) return true;
 
   if (textIncludesAny(car.title, filters.excludeKeywords)) return false;
+
+  // Must actually be a car (drops boats/motorcycles/RVs from the vehicles browse).
+  if (!looksLikeCar(car)) return false;
 
   // City whitelist: if set and we know the car's city, it must be in the list.
   const include = filters.includeCities;
