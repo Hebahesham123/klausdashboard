@@ -69,7 +69,10 @@ async function fetchDetail(context, url) {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
     await page.waitForTimeout(700 + Math.random() * 400);
     await page.mouse.wheel(0, 1200);
-    await page.waitForTimeout(500);
+    // Wait for the seller link so we reliably capture seller_id (needed to
+    // count a seller's cars). Cheap — resolves as soon as it renders.
+    await page.waitForSelector('a[href*="/marketplace/profile/"]', { timeout: 3000 }).catch(() => {});
+    await page.waitForTimeout(300);
     return await page.evaluate(() => {
       let listed = null;
       let mileage = null;
@@ -88,8 +91,10 @@ async function fetchDetail(context, url) {
                || bodyText.match(/\d+\s*k\s*(miles?|millas?)\b/i);
         if (m) mileage = m[0];
       }
-      const low = bodyText.toLowerCase();
-      const badge = low.includes('dealership') || /financ(e|ing)/.test(low);
+      // Dealer "tell" in the listing text — sales/financing language that
+      // private owners don't write. (Strong signals only, to avoid tagging a
+      // real owner who just says "clean title".)
+      const badge = /dealership|financ(e|ing)|financiamiento|buy here pay here|\bbhph\b|on approved credit|\boac\b|\bapr\b|we finance|guaranteed approval|(no|bad|poor)\s+credit|\$\s?\d[\d,]{2,}\s*(down|dwn)\b|\bdown payment\b|stock\s*#|stock\s*number|\bwholesale\b|se habla|\bllame\b|\bwarranty\b|dealer\b/i.test(bodyText);
       // Phone number written in the description (FB never exposes it otherwise).
       const pm = bodyText.match(/(\+?1[\s.-]?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b/);
       const phone = pm ? pm[0].trim() : null;
