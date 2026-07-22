@@ -38,11 +38,14 @@ export async function runOnce() {
   if (newCars.length > 0) console.log(`  🚗 ${newCars.length} new car(s) added — reading their FB times...`);
 
   // 2) Read pages for unchecked cars, brand-new ones first.
+  // Read order: Facebook "Just listed" first, then brand-new, then the rest —
+  // so the freshest cars get their real time + dealer check the soonest.
+  const prio = (c) => (c.justListed ? 0 : 2) + (existingIds.has(c.id) ? 1 : 0);
   const needTime = config.readDetails === false
     ? []
     : kept
         .filter((c) => !checkedIds.has(c.id))
-        .sort((a, b) => (existingIds.has(a.id) ? 1 : 0) - (existingIds.has(b.id) ? 1 : 0))
+        .sort((a, b) => prio(a) - prio(b))
         .slice(0, cap);
   if (needTime.length > 0) {
     console.log(`  Reading FB time + mileage + seller for ${needTime.length} car(s)...`);

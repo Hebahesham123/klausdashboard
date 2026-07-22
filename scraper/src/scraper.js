@@ -129,9 +129,12 @@ async function scrapeCity(context, search) {
         const href = a.getAttribute('href') || '';
         const idMatch = href.match(/\/marketplace\/item\/(\d+)/);
         if (!idMatch) continue;
-        const lines = (a.innerText || '').split('\n').map((s) => s.trim()).filter(Boolean);
+        const text = a.innerText || '';
+        const lines = text.split('\n').map((s) => s.trim()).filter(Boolean);
+        // Facebook's freshness badge on the card ("Just listed" / "Newly listed").
+        const justListed = /just listed|newly listed/i.test(text);
         const img = a.querySelector('img');
-        out.push({ id: idMatch[1], lines, imageUrl: img ? img.getAttribute('src') : null });
+        out.push({ id: idMatch[1], lines, justListed, imageUrl: img ? img.getAttribute('src') : null });
       }
       return out;
     });
@@ -170,6 +173,7 @@ async function scrapeCity(context, search) {
         url: `https://www.facebook.com/marketplace/item/${r.id}/`,
         postedText: null,
         postedAt: null,
+        justListed: r.justListed,
       });
     }
   } finally {
