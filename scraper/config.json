@@ -1,95 +1,30 @@
 {
-  "_comment": "SEARCH endpoint is blocked (too many keyword searches). BROWSE works. We tile the 65mi area with geographically-spread city anchors (small radius each), browsing the vehicles category newest-first. Each city returns its own local cars; distant cities barely overlap. If cars dry up, run `npm run login`.",
+  "_comment": "GENTLE config after a Marketplace 'temporarily blocked' (going too fast). Few spread cities, slow. Resume only AFTER the block lifts. Ramp up slowly.",
   "searches": [
     {
       "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/los-angeles/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
+      "scrolls": 6,
+      "url": "https://www.facebook.com/marketplace/los-angeles/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=25"
     },
     {
       "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/pasadena/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
+      "scrolls": 6,
+      "url": "https://www.facebook.com/marketplace/long-beach/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=25"
     },
     {
       "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/glendale/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
+      "scrolls": 6,
+      "url": "https://www.facebook.com/marketplace/riverside/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=25"
     },
     {
       "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/long-beach/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
+      "scrolls": 6,
+      "url": "https://www.facebook.com/marketplace/irvine/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=25"
     },
     {
       "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/torrance/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/downey/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/anaheim/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/santa-ana/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/irvine/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/huntington-beach/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/fullerton/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/west-covina/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/pomona/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/riverside/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/corona/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/ontario/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/san-bernardino/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
-    },
-    {
-      "city": null,
-      "scrolls": 10,
-      "url": "https://www.facebook.com/marketplace/norwalk/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=18"
+      "scrolls": 6,
+      "url": "https://www.facebook.com/marketplace/pasadena/vehicles?minPrice=6000&maxMileage=110000&sortBy=creation_time_descend&exact=false&radius=25"
     }
   ],
   "_filters_comment": "A car is kept if it matches ANY entry in 'wanted' (OR logic). Leave 'wanted' empty [] to keep every car. Current setup: ANY brand, price >= $6000, mileage <= 110k, year 2016-2025.",
@@ -206,7 +141,7 @@
   "maxCarsPerCity": 0,
   "_freshness_comment": "maxListingAgeDays: only keep cars FACEBOOK says were listed within this many days. null = keep ALL. maxDetailFetchesPerRun caps how many listing pages we open per run to read the exact time/mileage/seller.",
   "maxListingAgeDays": null,
-  "maxDetailFetchesPerRun": 45,
+  "maxDetailFetchesPerRun": 20,
   "_readDetails_note": "false = skip opening each car's page. Newest-found cars sort to the top.",
   "readDetails": true,
   "dealerMinListings": 3,
